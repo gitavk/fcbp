@@ -266,6 +266,7 @@ class NewUid(Report):
         (_('client'), 8000),
         (_('tariff'), 6000),
         (_('email'), 6000),
+        (_('phone'), 6000),
     ]
 
     table_styles = {
@@ -304,6 +305,8 @@ class NewUid(Report):
             else:
                 line.append('')
             line.append(row.email)
+            phone = row.mobile or row.phone or ''
+            line.append(phone)
             rows.append(line)
         return rows
 
