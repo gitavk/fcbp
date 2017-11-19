@@ -526,7 +526,7 @@ class PeriodSales(Report):
             line.append(row.date.strftime('%H:%M'))
             line.append(row.client.full_name)
             line.append(row.client.uid)
-            line.append(row.goods_short_name())
+            line.append(row.first_goods.short_name)
             if not row.extra_uid:
                 line.append(card.club_card.price)
                 line.append(card.discount_value)
