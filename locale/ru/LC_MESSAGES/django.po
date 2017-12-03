@@ -19,6 +19,9 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+msgid "all"
+msgstr "все"
+
 msgid "month"
 msgstr "месяц"
 
@@ -352,3 +355,36 @@ msgstr "Отчет по заморозкам клубных карт за пер
 
 msgid "active club card"
 msgstr "Действующий тарифный план на конечную дату"
+
+msgid "phone"
+msgstr "телефон"
+
+msgid "attribute"
+msgstr "признак"
+
+msgid "amount"
+msgstr "стоимость"
+
+msgid "date begin"
+msgstr "начало"
+
+msgid "date end"
+msgstr "окончание"
+
+msgid "used"
+msgstr "отработано"
+
+msgid "tariff club card"
+msgstr "Вид клубной карты"
+
+msgid "extra clients"
+msgstr "Фио второго человека в Сплите"
+
+msgid "coach"
+msgstr "тренер"
+
+msgid "last visit"
+msgstr "последнее посещение"
+
+msgid "prolongation"
+msgstr "продление"

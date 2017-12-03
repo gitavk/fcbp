@@ -154,34 +154,52 @@
   </div>
 </div>
 <br>
-
-<!-- reception -->
-<div class="col-md-5 center-block">&nbsp;</div>
-<div class="col-md-3 center-block"><strong>Ресепшен</strong></div>
-<div class="col-md-4 center-block">&nbsp;</div>
-<div class="clo-md-12">&nbsp;</div>
+<!-- clip(personal) cards -->
 <div class="row">
-  <div class="col-lg-3">
-    <a id='r_sells' href="/api/v1/reports/sales/?fdate={% now 'd.m.Y' %}" class="btn btn-success btn-block">
-      продажи за день</a>
+  <div class="col-md-3">
+    <a id='r_active_personal' href="/api/v1/reports/apc/?pc=0"
+    class="btn btn-success btn-block">Активные клип карты</a>
   </div>
-  <div class="col-lg-3">
-    <a id='r_visits'
-    href="/api/v1/reports/visits/?fdate={% now 'd.m.Y' %}"
-    class="btn btn-warning btn-block">
-      посещения</a>
-  </div>
-  <div class="col-lg-3">
-    <a id='r_birthdays'
-    href="/api/v1/reports/birthdays/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}"
-    class="btn btn-info btn-block">
-      Дни рождения</a>
+  <div class="col-md-3">
+    <select name="personal_type" class="btn-block">
+      <option value="0">все</option>
+      {% for option in pc_options %}
+      <option value="{{ option.personal__pk }}">
+        {{ option.personal__name }}
+      </option>
+      {% endfor %}
+    </select>
   </div>
 </div>
+<br>
+
+<!-- reception -->
+  <div class="col-md-5 center-block">&nbsp;</div>
+  <div class="col-md-3 center-block"><strong>Ресепшен</strong></div>
+  <div class="col-md-4 center-block">&nbsp;</div>
+  <div class="clo-md-12">&nbsp;</div>
+  <div class="row">
+    <div class="col-lg-3">
+      <a id='r_sells' href="/api/v1/reports/sales/?fdate={% now 'd.m.Y' %}" class="btn btn-success btn-block">
+        продажи за день</a>
+    </div>
+    <div class="col-lg-3">
+      <a id='r_visits'
+      href="/api/v1/reports/visits/?fdate={% now 'd.m.Y' %}"
+      class="btn btn-warning btn-block">
+        посещения</a>
+    </div>
+    <div class="col-lg-3">
+      <a id='r_birthdays'
+      href="/api/v1/reports/birthdays/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}"
+      class="btn btn-info btn-block">
+        Дни рождения</a>
+    </div>
+  </div>
 
 {% endblock %}
 
-  {% block extra_js %}
+{% block extra_js %}
 <script type="text/javascript">
 
 var updateUrlParam = function updateUrlParam(get_string, param, value) {
@@ -382,6 +400,14 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_active_card[5], 'cc', club_card_type)
     var r_active_card_url = r_active_card.slice(0, 5).join('/') + '/' + get_str
     $('#r_active_card').attr('href', r_active_card_url)
+  });
+
+  $('[name=personal_type]').change(function() {
+    var club_card_type = $(this).val()
+    var r_active_personal = $('#r_active_personal').attr('href').split('/')
+    var get_str = updateUrlParam(r_active_personal[5], 'pc', club_card_type)
+    var r_active_personal_url = r_active_personal.slice(0, 5).join('/') + '/' + get_str
+    $('#r_active_personal').attr('href', r_active_personal_url)
   });
 });
 </script>

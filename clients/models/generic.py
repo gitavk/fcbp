@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, date, timedelta
 
 from django.db.models.loading import get_model
+from django.db.models import Sum, Q
 
 
 class WritePayment(object):
@@ -79,6 +80,18 @@ class Property(object):
         now = datetime.now()
         return self.credit_set.filter(schedule__lte=now).exists()
 
+    @property
+    def summ_amount(self):
+        amount = 0
+        q_filter = Q(extra_uid__exact='') | Q(extra_uid__isnull=True)
+        psum = self.payment_set.filter(q_filter).aggregate(sum=Sum('amount'))
+        if psum.get('sum', 0):
+            amount += psum.get('sum', 0)
+        csum = self.credit_set.all().aggregate(sum=Sum('amount'))
+        if csum.get('sum', 0):
+            amount += csum.get('sum', 0)
+        return amount
+
     def full_name(self):
         return self.product.full_name
 
@@ -87,6 +100,18 @@ class Property(object):
 
     def is_full_time(self):
         return self.product.is_full_time
+
+    def schedule_payments(self):
+        pre_payments = []
+        schedule_start = self.date + timedelta(1)
+        payments = self.payment_set.filter(
+            date__gt=schedule_start, extra_uid__isnull=True)
+        for p in payments.order_by('date'):
+            pre_payments.append((p.date, p.amount))
+        for cr in self.credit_set.all().order_by('schedule'):
+            pdate = datetime.combine(cr.schedule, datetime.min.time())
+            pre_payments.append((pdate, cr.amount))
+        return pre_payments
 
     def similar_products(self):
         model = self.product._meta.model

@@ -17,6 +17,11 @@ alignment_c = xlwt.Alignment()
 alignment_c.horz = xlwt.Alignment.HORZ_CENTER
 alignment_c.vert = xlwt.Alignment.VERT_JUSTIFIED
 styleh.alignment = alignment_c
+# alignmenth center with wrap
+alignment_cw = xlwt.Alignment()
+alignment_cw.wrap = 1
+alignment_cw.horz = xlwt.Alignment.HORZ_CENTER
+alignment_cw.vert = xlwt.Alignment.VERT_JUSTIFIED
 # simple borders for table usually use
 borders = xlwt.Borders()
 borders.left = xlwt.Borders.THIN
@@ -71,6 +76,10 @@ style.borders = borders
 style_c = xlwt.XFStyle()
 style_c.borders = borders
 style_c.alignment = alignment_c
+# All data center wrap
+style_cw = xlwt.XFStyle()
+style_cw.borders = borders
+style_cw.alignment = alignment_cw
 # Red back ground data 
 style_red = xlwt.XFStyle()
 style_red.font.bold = True

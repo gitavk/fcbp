@@ -33,6 +33,7 @@ class Report(ViewSet):
         disposition = 'attachment; filename={file_name}.xls'.format(
             file_name=self.file_name)
         self.response['Content-Disposition'] = disposition
+        self.row_heiht = None
         self.wb = xlwt.Workbook(encoding='utf-8')
         self.ws = self.wb.add_sheet(self.sheet_name)
         self.write_title()
@@ -69,6 +70,8 @@ class Report(ViewSet):
                 style = self.table_styles.get(i, styles.style)
                 if not isinstance(cell, (list, set, tuple)):
                     self.ws.write(self.row_num, i, cell, style)
+                    if self.row_heiht:
+                        self.ws.row(self.row_num).height = self.row_heiht
                 else:
                     style.borders = styles.borders_cmb
                     row_step = self.write_multi_data(i, cell, style)

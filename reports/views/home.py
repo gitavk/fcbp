@@ -3,7 +3,7 @@ from django.views.generic import View
 from django.shortcuts import render_to_response
 from django.utils.translation import ugettext_lazy as _
 
-from clients.models import ClientClubCard
+from clients.models import ClientClubCard, ClientPersonal
 
 
 class Home(View, ):
@@ -14,8 +14,13 @@ class Home(View, ):
         cc_options = cc.values(
             'club_card__name', 'club_card__pk'
         ).order_by('club_card__name').distinct()
+        pc = ClientPersonal.objects.filter(status=1)
+        pc_options = pc.values(
+            'personal__name', 'personal__pk'
+        ).order_by('personal__name').distinct()
         cont = dict(
-            request=request, title=_('Reports'), cc_options=cc_options)
+            request=request, title=_('Reports'),
+            cc_options=cc_options, pc_options=pc_options)
         return render_to_response(self.template_name, cont)
 
 
