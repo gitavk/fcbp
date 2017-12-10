@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.utils.translation import ugettext_lazy as _
 
 from clients.models import ClientClubCard, ClientPersonal
+from employees.models import Employee
 
 
 class Home(View, ):
@@ -18,9 +19,13 @@ class Home(View, ):
         pc_options = pc.values(
             'personal__name', 'personal__pk'
         ).order_by('personal__name').distinct()
+        trainers = Employee.objects.filter(personals__isnull=False
+            ).distinct().order_by('last_name')
         cont = dict(
             request=request, title=_('Reports'),
-            cc_options=cc_options, pc_options=pc_options)
+            cc_options=cc_options, pc_options=pc_options,
+            trainers=trainers,
+        )
         return render_to_response(self.template_name, cont)
 
 

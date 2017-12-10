@@ -388,3 +388,12 @@ msgstr "последнее посещение"
 
 msgid "prolongation"
 msgstr "продление"
+
+msgid "use personals by trainers"
+msgstr "Отчёт по проведенным персональным тренировкам"
+
+msgid "total use personals by period"
+msgstr "количество проведенных тренировок всего за период"
+
+msgid "total by tariff"
+msgstr "в том числе по видам тарифного плана:"
