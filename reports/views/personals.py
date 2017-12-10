@@ -209,7 +209,9 @@ class UsePersonals(Report):
 
     def get_data(self):
         rows = []
-        fdate, tdate = self.get_fdate(), self.get_tdate()
+        fdate = self.get_fdate()
+        tdate = self.get_tdate() + timedelta(1)
+        tdate = tdate.replace(hour=0, minute=0, second=0)
         data = UseClientPersonal.objects.filter(
             date__range=(fdate, tdate)).order_by('date')
         if self.instructor != 'all':
