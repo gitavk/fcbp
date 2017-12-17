@@ -1,0 +1,30 @@
+<!-- Modal use ClubCard -->
+<div class="row">
+  <div class="form-group">
+    <label class="col-md-3"> Дата входа: </label>
+    <input class="col-md-3 sinput date-time" ng-model="vm.train.date">
+    <span ng-show="vm.train.end">
+      <label class="col-md-3"> Окончание: </label>
+      <input class="col-md-3 sinput time" ng-model="vm.train.end">
+    </span>
+  </div>
+  <br/>
+  <div class="form-group">
+    <label class="col-md-4 control-label">Инструктор:</label>
+    <div class="col-md-6">
+      <select ng-model="vm.train.instructor_id"
+      ng-options="employee.id as employee.initials
+                  for employee in vm.employees"></select>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-success pull-right" ng-click="vm.use_update()">Сохранить</button>
+  <a href="#/usepersonal/{{ vm.train.client_personal }}" class="btn btn-default pull-left">Назад</a>
+</div>
+<script type="text/javascript">
+jQuery(function($){
+   $(".date-time").mask("99.99.9999 99:99");
+   $(".time").mask("99:99");
+  });
+</script>

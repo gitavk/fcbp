@@ -26,6 +26,8 @@
       get: get,
       update: update,
       use: use,
+      use_get: use_get,
+      use_update: use_update,
       use_del: use_del,
       use_exit: use_exit,
       active: active,
@@ -85,6 +87,20 @@
 
     function use(fdata) {
       return $http.post('/api/v1/clients/usepersonal/', fdata)
+                  .error(function(data, status, headers, config) {
+                          console.log(data)
+                        });
+    }
+
+    function use_get(uid) {
+      return $http.get('/api/v1/clients/usepersonal/' + uid + '/')
+                  .error(function(data, status, headers, config) {
+                          console.log(data)
+                        });
+    }
+
+    function use_update(uid, fdata) {
+      return $http.put('/api/v1/clients/usepersonal/' + uid + '/',  fdata)
                   .error(function(data, status, headers, config) {
                           console.log(data)
                         });

@@ -79,6 +79,10 @@
       controller: 'EditVisitController',
       controllerAs: 'vm',
       templateUrl: '/static/templates/clients/use/edit_visit.html'
+    }).when('/editvisit_personal/:uid', {
+      controller: 'EditVisitPersonalController',
+      controllerAs: 'vm',
+      templateUrl: '/static/templates/clients/use/edit_visit_personal.html'
     }).when('/useaquaaerobics/:uid', {
       controller: 'UseClientAquaController',
       controllerAs: 'vm',
