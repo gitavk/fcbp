@@ -26,6 +26,7 @@
       get: get,
       update: update,
       use: use,
+      use_del: use_del,
       use_exit: use_exit,
       active: active,
       active_list: active_list,
@@ -66,7 +67,6 @@
       return $http.get('/api/v1/clients/personal/' + uid + '/')
     }
 
-
     function archive_client_list(uid) {
       return $http.get('/api/v1/clients/archive/personal/'+ uid + '/client/')
     }
@@ -85,6 +85,13 @@
 
     function use(fdata) {
       return $http.post('/api/v1/clients/usepersonal/', fdata)
+                  .error(function(data, status, headers, config) {
+                          console.log(data)
+                        });
+    }
+
+    function use_del(uid) {
+      return $http.delete('/api/v1/clients/usepersonal/' + uid + '/')
                   .error(function(data, status, headers, config) {
                           console.log(data)
                         });

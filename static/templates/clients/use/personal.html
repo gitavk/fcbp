@@ -277,7 +277,6 @@
 <!-- end modal Prolongation -->
 
 <div class="col-md-4 left-menu-block">
-
   <div class="col-md-12 row-border">
     <h4>
     <i class="fa fa-graduation-cap">
@@ -319,9 +318,8 @@
   </div>
   <!-- end club card data -->
 
-
   <!-- extra clients -->
-   <div class="col-md-12" ng-show="vm.personal.total_cients > 1">
+  <div class="col-md-12" ng-show="vm.personal.total_cients > 1">
     <br/>
     <span class="btn btn-info btn-block"> Дополнительные клиенты ({{ vm.personal.extra_clients.length }}) </span>
    </div>
@@ -373,9 +371,9 @@
        > Правка </button>
     </div>
   </div>
-<!-- end instructor -->
+  <!-- end instructor -->
 
-<!-- prolongation -->
+  <!-- prolongation -->
   <div class="panel panel-default col-md-12">
     <div class="panel-heading"><strong>Продление</strong></div>
     <div class="panel-body">
@@ -396,9 +394,9 @@
       </table>
     </div>
   </div>
-<!-- end prolongation -->
+  <!-- end prolongation -->
 
-<!-- ChangeOwner -->
+  <!-- ChangeOwner -->
   <div class="panel panel-default col-md-12">
     <div class="panel-heading"><strong>Переоформление</strong></div>
     <div class="panel-body">
@@ -416,14 +414,11 @@
       </table>
     </div>
   </div>
-<!-- End ChangeOwner -->
-
-
+  <!-- End ChangeOwner -->
 </div>
 <!-- .left menu block -->
 
 <div class="col-md-8 main-block">
- 
   <div class="row col-md-12">
     <div class="col-md-2" ng-switch on="vm.personal.is_online">
       <button class="btn btn-block btn-success"
@@ -468,11 +463,11 @@
         <div class="col-md-2"> {{ use.date | date:'HH:mm' }} </div>
         <div class="col-md-2"> {{ use.end | date:'HH:mm' }} </div>
         <div class="col-md-3"> {{ use.instructor|| "-" }} </div>
-        <div class="col-md-1 hide">
-          <a class="fa fa-edit text-yellow pull-left" href="#/editvisit/{{ use.id }}/">
+        <div class="col-md-1">
+          <a class="fa fa-edit text-yellow pull-left">
           </a>
         </div>
-        <div class="col-md-1 hide">
+        <div class="col-md-1">
           <i class="fa fa-recycle cursor-pointer text-red pull-right" ng-click="vm.use_del(use.id)"></i>
         </div>
         <div ng-show="collapsed" class="bg-info col-md-12">

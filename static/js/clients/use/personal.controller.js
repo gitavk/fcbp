@@ -23,6 +23,7 @@
     var vm = this;
 
     vm.use = use;
+    vm.use_del = use_del;
     vm.set_emp = set_emp;
     vm.prolongation = prolongation;
     vm.prolongation_del = prolongation_del;
@@ -112,7 +113,6 @@
         };
 
       };
-
       /**
       * @name personalclientErrorFn
       * @desc console log error
@@ -120,8 +120,6 @@
       function personalclientErrorFn(data, status, headers, config) {
         console.log(data);
       }
-
-
     }; // end activate
 
     function set_emp() {
@@ -145,8 +143,7 @@
       }
     };
 
-    /* Search new owners clients
-    */
+    /* Search new owners clients */
     function search_client() {
       vm.new_owner = ""
       Clients.full_search(vm.ext).then(clntSearchSuccessFn, clntSearchErrorFn);
@@ -173,9 +170,7 @@
       vm.findClients = [];
     }
 
-    /*
-    * Set new owner
-    */
+    /* Set new owner */
     function set_owner() {
       Personals.ownerp({
         "client": vm.new_owner.id,
@@ -193,22 +188,21 @@
       }
     };
 
+    // add extra clients to the personal
     function add_extra() {
       Personals.add_extra(vm.uid, {
         "extra_client": vm.new_extra.id,
       }).then(clntAddExtraSuccessFn, clntAddExtraErrorFn);
-
       function clntAddExtraSuccessFn(data, status, headers, config) {
         activate();
       }
-
       function clntAddExtraErrorFn(data, status, headers, config) {
         console.log(data);
       }
     };
 
+    // Add prolongation record
     function prolongation(is_extra) {
-
       if (is_extra == 'is_extra') {
         if (!vm.prdata.note) {
           vm.prdata.err = 'Поле примечание должно содеражть не менее 3 символов'
@@ -218,9 +212,7 @@
         vm.prdata.amount = 0
         vm.prdata.is_extra = true
       }
-
       Personals.prolongation(vm.prdata).then(prolongationSuccessFn, prolongationErrorFn);
-
       /**
       * @name prolongationSuccessFn
       * @desc Update Personals array on view
@@ -236,12 +228,10 @@
       function prolongationErrorFn(data, status, headers, config) {
         console.log(data);
       }
-
     };
-
+    // Remove prolongation record
     function prolongation_del(uid) {
       Personals.prolongation_del(uid).then(prolongationSuccessFn, prolongationErrorFn);
-
       /**
       * @name prolongationSuccessFn
       * @desc Update Personals array on view
@@ -249,7 +239,6 @@
       function prolongationSuccessFn(data, status, headers, config) {
         activate();
       }
-
       /**
       * @name prolongationErrorFn
       * @desc console log error
@@ -257,9 +246,9 @@
       function prolongationErrorFn(data, status, headers, config) {
         console.log(data);
       }
-
     };
 
+    // Add new visit
     function use(out) {
       if (out) {
         Personals.use_exit(vm.udata).then(personalclientSuccessFn, personalclientErrorFn);
@@ -281,8 +270,28 @@
       function personalclientErrorFn(data, status, headers, config) {
         console.log(data);
       }
-    }; // End function out
+    }; // End function use
 
+    // Remove visit
+    function use_del(uid) {
+      Personals.use_del(uid).then(useSuccessFn, useErrorFn);
+      /**
+      * @name useSuccessFn
+      * @desc Update ClubCard array on view
+      */
+      function useSuccessFn(data, status, headers, config) {
+        activate();
+      }
+      /**
+      * @name useErrorFn
+      * @desc console log error
+      */
+      function useErrorFn(data, status, headers, config) {
+        console.log(data);
+      }
+    }; // End remove visit
+
+    // Deactivate
     function to_archive() {
       $http.patch('/api/v1/clients/personal/' + vm.uid + '/', vm.ardata
                 ).then(to_archiveSuccessFn, to_archiveErrorFn);
@@ -304,6 +313,7 @@
       }
     };
 
+    // Function update_date_begin
     function update_date_begin() {
       vm.new_date.update_success = false
       vm.new_date.update_error = false

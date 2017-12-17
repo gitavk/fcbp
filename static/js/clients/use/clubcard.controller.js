@@ -276,7 +276,6 @@
 
     function use_del(uid) {
       ClubCard.use_del(uid).then(useSuccessFn, useErrorFn);
-
       /**
       * @name useSuccessFn
       * @desc Update ClubCard array on view
@@ -292,7 +291,6 @@
       function useErrorFn(data, status, headers, config) {
         console.log(data);
       }
-
     }
 
     function guest() {
