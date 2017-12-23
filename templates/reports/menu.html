@@ -189,10 +189,16 @@
       {% endfor %}
     </select>
   </div>
-    <div class="col-md-3">
+  <div class="col-md-3">
     <a id='r_use_personal' href="/api/v1/reports/upc/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}&c=0"
     class="btn btn-info btn-block" style="white-space: normal;">
       <small>Отчёт по проведенным персональным тренировкам</small></a>
+  </div>
+    <div class="col-md-3">
+    <a
+      id='r_total_personal'
+      href="/api/v1/reports/tpc/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}"
+      class="btn btn-danger btn-block" style="white-space: normal;"><small>Сводный отчет по видам проданных клип-карт</small></a>
   </div>
 </div>
 <br>
@@ -337,6 +343,11 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_use_personal[5], 'fdate', fdate)
     var r_use_personal_url = r_use_personal.slice(0, 5).join('/') + '/' + get_str
     $('#r_use_personal').attr('href', r_use_personal_url)
+    // r_total_personal
+    var r_total_personal = $('#r_total_personal').attr('href').split('/')
+    var get_str = updateUrlParam(r_total_personal[5], 'fdate', fdate)
+    var r_total_personal_url = r_total_personal.slice(0, 5).join('/') + '/' + get_str
+    $('#r_total_personal').attr('href', r_total_personal_url)
   });
 
   $('[name=tdate]').change(function() {
@@ -426,6 +437,11 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_use_personal[5], 'tdate', tdate)
     var r_use_personal_url = r_use_personal.slice(0, 5).join('/') + '/' + get_str
     $('#r_use_personal').attr('href', r_use_personal_url)
+    // r_total_personal
+    var r_total_personal = $('#r_total_personal').attr('href').split('/')
+    var get_str = updateUrlParam(r_total_personal[5], 'tdate', tdate)
+    var r_total_personal_url = r_total_personal.slice(0, 5).join('/') + '/' + get_str
+    $('#r_total_personal').attr('href', r_total_personal_url)
   });
 
   $('[name=club_card_type]').change(function() {

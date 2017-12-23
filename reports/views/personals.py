@@ -5,11 +5,12 @@ from collections import defaultdict
 from django.db.models import Sum
 from django.utils.translation import ugettext as _
 
-from .base import Report
-from reports import styles
-from clients.models import ClientPersonal, UseClientPersonal
-from products.models import Personal
 from employees.models import Employee
+from clients.models import ClientPersonal, UseClientPersonal
+from finance.models import Payment
+from products.models import Personal
+from reports import styles
+from .base import Report
 
 
 class ActivePersonal(Report):
@@ -244,7 +245,7 @@ class UsePersonals(Report):
             self.row_num, self.row_num, 0, 3,
             _('total use personals by period'))
         self.ws.write(self.row_num, 4,
-            sum(self.products.values()), styles.styleh)
+                      sum(self.products.values()), styles.styleh)
         self.row_num += 1
         self.ws.write_merge(
             self.row_num, self.row_num, 0, 3, _('total by tariff'))
@@ -253,3 +254,59 @@ class UsePersonals(Report):
             self.ws.write_merge(row_num, row_num, 0, 1, product)
             self.ws.write(
                 row_num, 2, self.products.get(product), styles.styleh)
+
+
+class TotalPersonals(Report):
+
+    file_name = 'total_personals'
+    sheet_name = 'total_personals'
+    tpl_start_row = 5
+
+    table_headers = [
+        (_('tariff'), 10000),
+        (_('total'), 4000),
+    ]
+
+    def get_title(self, **kwargs):
+        return _('total personals')
+
+    def write_title(self):
+        super(TotalPersonals, self).write_title()
+        msg = _('from: {fdate} to {tdate}')
+        fdate = self.get_fdate().strftime('%d.%m.%Y')
+        tdate = self.get_tdate().strftime('%d.%m.%Y')
+        msg = msg.format(fdate=fdate, tdate=tdate)
+        ln_head = len(self.table_headers) - 1
+        self.ws.write_merge(1, 1, 0, ln_head, msg, styles.styleh)
+
+    def personals_list(self):
+        fdate = self.get_fdate().date()
+        tdate = self.get_tdate().date() + timedelta(1)
+        personals = ClientPersonal.objects.filter(
+            payment__date__range=(fdate, tdate))
+        # generate filter to get only first payment
+        filter_pk = []
+        for p in personals:
+            if p.first_payment.date.date() >= fdate:
+                filter_pk.append(p.pk)
+        return personals.filter(pk__in=filter_pk)
+
+    def get_data(self):
+        rows = []
+        personals = self.personals_list()
+        data_pks = personals.values('personal__pk')
+        data = Personal.objects.filter(
+            pk__in=data_pks).order_by('max_visit', 'short_name')
+        total = 0
+        for row in data:
+            line = []
+            line.append(row.short_name)
+            cnt = personals.filter(personal=row).count()
+            line.append(cnt)
+            total += cnt
+            rows.append(line)
+        rows.append((_('total'), total))
+        return rows
+
+    def write_bottom(self):
+        pass
