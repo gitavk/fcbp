@@ -671,7 +671,6 @@
       function closeErrorFn(data, status, headers, config) {
         console.log(data);
       }
-
     };
 
     // function for update date of the credit

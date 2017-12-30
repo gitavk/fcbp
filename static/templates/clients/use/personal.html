@@ -1,4 +1,4 @@
-<!-- Modal use ClubCard -->
+<!-- Modal use UsePersonal -->
 <div class="modal fade" id="UsePersonal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="width: 600px;">
     <div class="modal-content">
@@ -23,7 +23,7 @@
       </div>
     </div>
   </div>
-</div> <!-- end modal ClubCard -->
+</div> <!-- end modal UsePersonal -->
 
 <!-- Modal ChangeOwner -->
 <div class="modal fade" id="ChangeOwner" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -498,7 +498,7 @@
         <td> {{ p.payment_type | payment_type }}</td>
         <td></td>
       </tr>
-      <tr ng-repeat="cr in vm.card.credit_set">
+      <tr ng-repeat="cr in vm.personal.credit_set">
         <td><button class="btn btn-xs btn-info" ng-click="day_change=!day_change">изменить</button>
             {{ cr.schedule | date:'dd.MM.yyyy' }}
             <div class="block" ng-show="day_change">
@@ -603,4 +603,4 @@
   <!-- end prolongation -->
 
     </div><!-- .panel-body -->
-</div><!-- .panel-danger
+</div><!-- .panel-danger -->

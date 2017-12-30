@@ -11,14 +11,14 @@
 
   UseClientPersonalController.$inject = [
     '$location', '$rootScope', '$routeParams', '$scope', '$http',
-    'Personals', 'Employees', 'Clients'];
+    'Personals', 'Employees', 'Clients', 'ClientCredit', 'ClientPayment'];
 
   /**
   * @namespace UseClientPersonalController
   */
   function UseClientPersonalController(
     $location, $rootScope, $routeParams, $scope, $http,
-    Personals, Employees, Clients) {
+    Personals, Employees, Clients, ClientCredit, ClientPayment) {
 
     var vm = this;
 
@@ -34,6 +34,9 @@
     vm.update_date_begin = update_date_begin;
     vm.add_extra = add_extra;
     vm.to_archive = to_archive;
+    vm.day_change = day_change;
+    vm.cr_split = cr_split;
+    vm.payment = payment;
 
     activate();
 
@@ -83,18 +86,23 @@
           vm.new_date = {
             date_begin: moment(vm.personal.date_begin, 'YYYY-MM-DD').format('DD.MM.YYYY'),
           }
-        }
+        };
 
         vm.udata = {
           instructor: vm.personal.instructor,
           client_personal: vm.uid
-        }
+        };
 
         // to archive data
         vm.ardata = {
           status: 0,
           block_comment: ''
-        }
+        };
+
+        // for edit credit_set date
+        angular.forEach(vm.personal.credit_set, function (value, key) {
+          value.schedule = moment(value.schedule, 'YYYY-MM-DD').format('DD.MM.YYYY');
+        });
 
         Employees.personal_trainers(vm.emp_filter).then(listEmployeeSuccessFn, listEmployeeErrorFn);
         /**
@@ -336,6 +344,75 @@
         vm.new_date.update_error = data.data['date_begin'][0];
       }
     }; // END function update_date_begin
+
+
+    // function for update date of the credit
+    function day_change(cr) {
+      var fdata = {'schedule': cr.schedule}
+      ClientCredit.update(cr.id, fdata).then(CrUpdSuccessFn, CrUpdErrorFn);
+
+      /**
+      * @name CrUpdSuccessFn
+      * @desc Update ClubCard array on view
+      */
+      function CrUpdSuccessFn(data, status, headers, config) {
+        console.log('success')
+        activate()
+      }
+
+      /**
+      * @name CrUpdErrorFn
+      * @desc console log error
+      */
+      function CrUpdErrorFn(data, status, headers, config) {
+        console.log(data);
+      }
+    };
+
+    // function for split amount of the credit
+    function cr_split(cr) {
+      var fdata = {'amount': cr.amount}
+      ClientCredit.update(cr.id, fdata).then(CrUpdSuccessFn, CrUpdErrorFn);
+
+      /**
+      * @name CrUpdSuccessFn
+      * @desc Update ClubCard array on view
+      */
+      function CrUpdSuccessFn(data, status, headers, config) {
+        activate()
+      }
+
+      /**
+      * @name CrUpdErrorFn
+      * @desc console log error
+      */
+      function CrUpdErrorFn(data, status, headers, config) {
+        console.log(data);
+      }
+    };
+
+    // function for close credit
+    function payment(payment_type, uid) {
+      ClientPayment.close_credit(payment_type, uid)
+                   .then(closeSuccessFn, closeErrorFn);
+
+      /**
+      * @name closeSuccessFn
+      * @desc Update ClubCard array on view
+      */
+      function closeSuccessFn(data, status, headers, config) {
+        console.log('success')
+        activate()
+      }
+
+      /**
+      * @name closeErrorFn
+      * @desc console log error
+      */
+      function closeErrorFn(data, status, headers, config) {
+        console.log(data);
+      }
+    };
 
   };
 
