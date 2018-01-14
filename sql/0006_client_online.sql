@@ -12,7 +12,9 @@ FROM (
         ON cc.id = ucc.client_club_card_id
      INNER JOIN products_clubcard pcc
         ON pcc.id = cc.club_card_id
-    WHERE ucc.end IS NULL
+     LEFT JOIN clients_useclientpersonal ucp
+        ON ucc.id = ucp.club_card_visit_id
+    WHERE ucc.end IS NULL AND ucp.id IS NULL
 
     UNION ALL
 
