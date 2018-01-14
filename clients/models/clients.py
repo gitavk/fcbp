@@ -1219,7 +1219,7 @@ class UseClientPersonal(models.Model):
     """
     Log information about use the Client Personal.
     """
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField()
     end = models.DateTimeField(blank=True, null=True)
     client_personal = models.ForeignKey(
         ClientPersonal, related_name='visits')

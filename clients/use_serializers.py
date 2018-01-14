@@ -35,6 +35,7 @@ class UseClientTicketSerializer(serializers.ModelSerializer):
 
 
 class UseClientPersonalSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(required=False, allow_null=True)
     instructor = serializers.ReadOnlyField(source='instructor.initials')
     instructor_id = serializers.ReadOnlyField(source='instructor.pk')
     positions = serializers.ListField(
