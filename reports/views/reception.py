@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from datetime import timedelta, datetime
 
 from django.utils.translation import ugettext as _
@@ -6,7 +7,9 @@ from django.db.models import Sum
 
 from .base import Report
 from reports import styles
-from clients.models import ClientClubCard, UseClientClubCard, Client
+from clients.models import (
+    ClientClubCard, UseClientClubCard, Client, UseClientPersonal)
+from employees.models import Employee
 from finance.models import Payment
 from products.models import Training
 
@@ -53,7 +56,7 @@ class Sales(Report):
         end_date = fdate + timedelta(1)
         data = Payment.objects.filter(
             date__range=(fdate, end_date)
-            ).exclude(club_card__isnull=True).exclude(payment_type=3)
+        ).exclude(club_card__isnull=True).exclude(payment_type=3)
         for row in data:
             line = []
             card = row.club_card
@@ -202,7 +205,7 @@ class Birthdays(Report):
         if not value:
             return ''
         value = str(value)
-        return '+7 (%s) %s - %s' %(value[0:3],value[3:6],value[6:10])
+        return '+7 (%s) %s - %s' % (value[0:3], value[3:6], value[6:10])
 
     def get_data(self):
         rows = []
@@ -219,3 +222,107 @@ class Birthdays(Report):
 
     def write_bottom(self):
         pass
+
+
+class UsePersonals(Report):
+    """Personals visits by dates with employee info"""
+
+    file_name = 'trainers_personal'
+    sheet_name = 'report'
+    tpl_start_row = 7
+
+    table_headers = [
+        (_('date'), 3000),
+        (_('time'), 3000),
+        (_('card number'), 2000),
+        (_('client'), 6000),
+        (_('tariff'), 6000),
+        (_('coach'), 5000),
+    ]
+
+    table_styles = {
+        0: styles.styled,
+        1: styles.stylet,
+    }
+
+    def get_fdate(self):
+        return datetime.today().replace(hour=0, minute=0)
+
+    def get_tdate(self):
+        return self.get_fdate()
+
+    def initial(self, request, *args, **kwargs):
+        super(UsePersonals, self).initial(request, *args, **kwargs)
+        self.products = defaultdict(int)
+        fdate = self.get_fdate()
+        tdate = self.get_tdate() + timedelta(1)
+        tdate = tdate.replace(hour=0, minute=0, second=0)
+        self.data = UseClientPersonal.objects.filter(
+            date__range=(fdate, tdate))
+
+    def get_title(self, **kwargs):
+        msg = _('use personals by trainers')
+        msg += _(' created at: {date}.')
+        date = datetime.now().strftime('%d.%m.%Y %H:%M')
+        return msg.format(date=date)
+
+    def write_title(self):
+        super(UsePersonals, self).write_title()
+        msg = _('from: {fdate} to {tdate}')
+        fdate = self.get_fdate().strftime('%d.%m.%Y')
+        tdate = self.get_tdate().strftime('%d.%m.%Y')
+        msg = msg.format(fdate=fdate, tdate=tdate)
+        ln_head = len(self.table_headers) - 1
+        self.ws.write_merge(1, 1, 0, ln_head, msg, styles.styleh)
+
+    def get_data(self):
+        rows = []
+        data = self.data.filter(instructor=self.instructor).order_by('date')
+        for row in data:
+            client = row.client_personal.client.full_name
+            tariff = row.client_personal.product.short_name
+            self.products[tariff] += 1
+            instructor = row.instructor.initials if row.instructor else ''
+            rows.append((
+                row.date, row.date.strftime('%H:%M'), row.client_personal.pk,
+                client, tariff, instructor
+            ))
+        return rows
+
+    def write_heads(self):
+        self.ws.write_merge(
+            self.row_num, self.row_num, 0, 2, _('coach'), styles.styleh)
+        self.ws.write_merge(
+            self.row_num, self.row_num, 3, 6,
+            self.instructor.initials, styles.styleh)
+        self.row_num += 2
+        super(UsePersonals, self).write_heads()
+
+    def write_bottom(self):
+        self.ws.write_merge(
+            self.row_num, self.row_num, 0, 3,
+            _('total use personals by period'))
+        self.ws.write(self.row_num, 4,
+                      sum(self.products.values()), styles.styleh)
+        self.row_num += 1
+        self.ws.write_merge(
+            self.row_num, self.row_num, 0, 3, _('total by tariff'))
+
+        for row_num, product in enumerate(self.products, self.row_num + 1):
+            self.ws.write_merge(row_num, row_num, 0, 1, product)
+            self.ws.write(
+                row_num, 2, self.products.get(product), styles.styleh)
+        # reset products
+        self.products = defaultdict(int)
+
+    def write_sheet(self):
+        self.row_num = 2
+        ipks = self.data.values_list( 'instructor', flat=True)
+        for emp in Employee.objects.filter(pk__in=ipks).order_by('last_name'):
+            self.instructor = emp
+            self.write_heads()
+            self.row_num += 1
+            self.write_data()
+            self.row_num += 2
+            self.write_bottom()
+            self.row_num += 4

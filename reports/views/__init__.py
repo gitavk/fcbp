@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .reception import Sales, Visits, Birthdays
+from .reception import Sales, Visits, Birthdays, UsePersonals as RUPC
 from .home import Home, Reception
 from .managers import (
     ActiveClubCard, CreditsClubCard, NewUid, CommonList, FullList,
@@ -18,4 +18,4 @@ __all__ = [
     'TotalClubCard', 'TotalActiveClubCard', 'ClubCardDiscount',
     'ClubCardDisabled', 'ClubCardProspect', 'BestLoyalty', 'PeriodSales',
     'ExtrProlongation', 'VisitsPeriod', 'OtherPayments', 'Freeze',
-    'ActivePersonal', 'UsePersonals', 'TotalPersonals']
+    'ActivePersonal', 'UsePersonals', 'TotalPersonals', 'RUPC']
