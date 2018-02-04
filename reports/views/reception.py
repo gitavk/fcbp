@@ -312,17 +312,17 @@ class UsePersonals(Report):
             self.ws.write_merge(row_num, row_num, 0, 1, product)
             self.ws.write(
                 row_num, 2, self.products.get(product), styles.styleh)
+        self.row_num = row_num + 3
         # reset products
         self.products = defaultdict(int)
 
     def write_sheet(self):
         self.row_num = 2
-        ipks = self.data.values_list( 'instructor', flat=True)
+        ipks = self.data.values_list('instructor', flat=True)
         for emp in Employee.objects.filter(pk__in=ipks).order_by('last_name'):
             self.instructor = emp
             self.write_heads()
             self.row_num += 1
             self.write_data()
-            self.row_num += 2
+            self.row_num += 1
             self.write_bottom()
-            self.row_num += 4
