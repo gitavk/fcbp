@@ -552,6 +552,9 @@
         <span class="col-md-3 cursor-pointer btn-grey" ng-click="coll_p=!coll_p" ng-show="vm.personal.status==1">
           <strong>Дополнительное продление</strong>
         </span>
+        <span class="col-md-3 cursor-pointer btn-success" ng-click="coll_t=!coll_t" ng-show="vm.similar">
+          <strong>Изменить вид карты</strong>
+        </span>
       </div><!-- .row -->
 
   <!--  Change activation date-->
@@ -601,6 +604,36 @@
          ng-click="vm.prolongation('is_extra')">Применить</div>
   </div>
   <!-- end prolongation -->
+  <!--  Change card type-->
+  <div ng-show="coll_t" class="col-md-12">
+    <div class="col-md-12 bg-danger">
+      <strong>Изменить вид карты</strong>
+    </div>
+    <div class="col-md-12">
+      <span class="bg-success" ng-show="vm.new_type.update_success">обновлено</span>
+      <div class="alert alert-danger" role="alert"  ng-show="vm.new_type.update_error">
+        <strong>{{ vm.new_type.update_error }}</strong>
+      </div>
+    </div>
+    <div class="col-md-3">
+        <label>Новый тип</label>
+        <select ng-model="vm.new_type.personal"
+         class="container-full" ng-change="vm.new_type_amount()"
+         ng-options="o.id as o.name for o in vm.similar">
+        </select>
+    </div>
+    <div class="col-md-3">
+      <label>сумма платежа</label>
+      <input ng-model="vm.new_type.amount" type="number" class="form-control">
+    </div>
+    <div class="col-md-3">
+      <label>дата платежа</label>
+      <input ng-model="vm.new_type.date" type="text" class="form-control date">
+    </div>
+    <div class="btn btn-primary col-md-3" ng-click="vm.update_type()">Применить</div>
+  </div>
+  <!-- end Change card type -->
+  </div>
 
     </div><!-- .panel-body -->
 </div><!-- .panel-danger -->

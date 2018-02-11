@@ -898,7 +898,7 @@
   <span class="col-md-3 cursor-pointer btn-success" ng-click="coll_t=!coll_t" ng-show="vm.similar">
       <strong>Изменить вид карты</strong>
     </span>
-<!--  Change activation date-->
+  <!--  Change club card type-->
     <div ng-show="coll_t" class="col-md-12">
       <div class="col-md-12 bg-danger">
         <strong>Изменить вид карты</strong>
@@ -926,7 +926,7 @@
       </div>
       <div class="btn btn-primary col-md-3" ng-click="vm.update_type()">Применить</div>
     </div>
-<!-- end Change activation date -->
+  <!-- end Change club card type -->
   </div>
 <div class="alert alert-info" role="alert">
   <strong><a ng-href="api/v1/clients/clubcard/{{vm.card.id}}/card/">Печать</a></strong>
@@ -936,19 +936,18 @@
 <script type="text/javascript">
   jQuery(function($){
 
-   $(".date").mask("99.99.9999");
-   $(".date-time").mask("99.99.9999 99:99");
-   $(".mobile").mask("(999)-999-9999");
-   $(".phone").mask("999-9999");
+    $(".date").mask("99.99.9999");
+    $(".date-time").mask("99.99.9999 99:99");
+    $(".mobile").mask("(999)-999-9999");
+    $(".phone").mask("999-9999");
 
-   $('.mobile-toggle').on('click', function(){
-    if ($(this).is (':checked')) {
+    $('.mobile-toggle').on('click', function(){
+      if ($(this).is (':checked')) {
         $(".mobile").mask("999-9999");
-    } else {
+      } else {
         $(".mobile").mask("(999)-999-9999");
-    };
-
-   });
+      };
+    });
 
 });
 </script>

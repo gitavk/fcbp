@@ -37,6 +37,7 @@
     vm.day_change = day_change;
     vm.cr_split = cr_split;
     vm.payment = payment;
+    vm.update_type = update_type;
 
     activate();
 
@@ -117,6 +118,24 @@
         * @desc Propogate error event and show snackbar with error message
         */
         function listEmployeeErrorFn(data, status, headers, config) {
+          console.log(data)
+        };
+
+        Personals.similar(vm.uid).then(listSimilarSuccessFn, listSimilarErrorFn);
+
+        /**
+        * @name listSimilarSuccessFn
+        * @desc Show snackbar with success message
+        */
+        function listSimilarSuccessFn(data, status, headers, config) {
+          vm.similar = data.data;
+        };
+
+        /**
+        * @name listSimilarErrorFn
+        * @desc Propogate error event and show snackbar with error message
+        */
+        function listSimilarErrorFn(data, status, headers, config) {
           console.log(data)
         };
 
@@ -410,6 +429,28 @@
       * @desc console log error
       */
       function closeErrorFn(data, status, headers, config) {
+        console.log(data);
+      }
+    };
+
+    // manual update_type 
+    function update_type() {
+      $http.post('/api/v1/clients/personal/' + vm.uid + '/new_type/', vm.new_type
+                ).then(activationSuccessFn, activationErrorFn);
+
+      /**
+      * @name activationSuccessFn
+      * @desc Update ClubCard on view
+      */
+      function activationSuccessFn(data, status, headers, config) {
+        activate();
+      }
+
+      /**
+      * @name activationErrorFn
+      * @desc console log error
+      */
+      function activationErrorFn(data, status, headers, config) {
         console.log(data);
       }
     };

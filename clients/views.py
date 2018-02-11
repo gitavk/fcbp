@@ -401,6 +401,8 @@ class ClientTicketViewSet(
 class ClientPersonalViewSet(viewsets.ModelViewSet):
     queryset = ClientPersonal.objects.order_by('-date')
     serializer_class = ClientPersonalSerializer
+    serializer_similar = PersonalSerializer
+    finance_obj = 'personal'
 
     @detail_route(methods=['post'], )
     def add_extra(self, request, pk):
@@ -409,6 +411,37 @@ class ClientPersonalViewSet(viewsets.ModelViewSet):
         PersonalClients.objects.get_or_create(
             client_id=extra_client, personal=obj)
         return Response({})
+
+    @detail_route(methods=['get'], )
+    def similar(self, request, pk):
+        obj = self.get_object()
+        data = obj.similar_products().filter(
+            max_visit__gte=obj.product.max_visit)
+        serializer = self.serializer_similar(data, many=True)
+        return Response(serializer.data)
+
+    @detail_route(methods=['post'], )
+    def new_type(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        amount = request.data.get('amount')
+        if amount:
+            data = {}
+            data['amount'] = amount
+            data['schedule'] = request.data.get('date')
+            data['discount'] = 0
+            data['count'] = 1
+            data['client'] = instance.client.pk
+            data[self.finance_obj] = instance.pk
+            form = FormCredit(data)
+            if form.is_valid():
+                form.save()
+            else:
+                print form.errors
+        return Response(serializer.data)
 
 
 class ClientTimingViewSet(viewsets.ModelViewSet):

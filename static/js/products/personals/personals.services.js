@@ -34,6 +34,7 @@
       active_list: active_list,
       prolongation: prolongation,
       prolongation_del: prolongation_del,
+      similar: similar,
       ownerp: ownerp,
       add_extra: add_extra,
       archive_client_list: archive_client_list,
@@ -132,6 +133,10 @@
                   .error(function(data, status, headers, config) {
                           console.log(data)
                         });
+    }
+
+    function similar(uid) {
+      return $http.get('/api/v1/clients/personal/' + uid + '/similar/')
     }
 
     function ownerp(fdata) {

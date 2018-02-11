@@ -225,9 +225,7 @@
       */
       function listSimilarSuccessFn(data, status, headers, config) {
         vm.similar = data.data;
-        console.log(vm.similar)
       }
-
 
       /**
       * @name listSimilarErrorFn
@@ -802,8 +800,7 @@
       function clntSetOwnerErrorFn(data, status, headers, config) {
         console.log(data);
       }
-
-    }
+    };
 
   };
 
