@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
@@ -56,9 +58,10 @@ class ClientPersonalViewSet(
         Get list archive Client Personal for the client.
         """
         client = Client.objects.get(pk=pk)
-        queryset = ClientPersonal.objects.filter(client=client)\
-                                         .order_by('-date')
-        serializer = ClientPersonalSerializer(queryset, many=True)
+        extra_personals = client.extra_personals.values('personal')
+        qf = Q(pk__in=extra_personals) | Q(client=client)
+        qs = ClientPersonal.objects.filter(qf).order_by('-date')
+        serializer = ClientPersonalSerializer(qs, many=True)
         return Response(serializer.data,
                         status=status.HTTP_202_ACCEPTED)
 
