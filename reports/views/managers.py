@@ -299,9 +299,9 @@ class NewUid(Report):
             line.append(row.uid)
             line.append(row.date.strftime('%d.%m.%Y'))
             line.append(row.full_name)
-            card = row.clientclubcard_set.all().first()
+            card = row.initial_purchase
             if card:
-                line.append(card.club_card.short_name)
+                line.append(card.short_name)
             else:
                 line.append('')
             line.append(row.email)

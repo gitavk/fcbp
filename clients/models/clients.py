@@ -119,6 +119,22 @@ class Client(models.Model):
         """Client's active club cards"""
         return self.active_cc.first()
 
+    @property
+    def initial_purchase(self):
+        initial_card = self.clientclubcard_set.order_by('date').first()
+        initial_personal = self.clientpersonal_set.order_by('date').first()
+        if not initial_personal:
+            # look by extra personals
+            extra_p = self.extra_personals.order_by('personal__date').first()
+            if extra_p:
+                initial_personal = extra_p.personal
+        if initial_card and initial_personal:
+            if initial_card.date < initial_personal.date:
+                return initial_card
+            else:
+                return initial_personal
+        return initial_card or initial_personal
+
     def save(self, *args, **kwargs):
         if not self.uid:
             mon = date.today() + timedelta(days=-date.today().weekday())
