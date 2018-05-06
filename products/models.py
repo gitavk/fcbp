@@ -218,6 +218,7 @@ class CardText(models.Model):
     """
     text_types = (
         (1, 'клубная карта'),
+        (2, 'персональная карта')
     )
 
     text_type = models.SmallIntegerField(choices=text_types, unique=True)

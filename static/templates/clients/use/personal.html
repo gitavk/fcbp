@@ -276,6 +276,10 @@
 </div>
 <!-- end modal Prolongation -->
 
+<div class="alert alert-info" role="alert" ng-show="!vm.personal.printed">
+  <strong><a ng-href="api/v1/clients/personal/{{vm.personal.id}}/card/">Печать</a></strong>
+</div>
+
 <div class="col-md-4 left-menu-block">
   <div class="col-md-12 row-border">
     <h4>
@@ -635,5 +639,10 @@
   <!-- end Change card type -->
   </div>
 
+  <div class="alert alert-info">
+    <strong><a ng-href="api/v1/clients/personal/{{vm.personal.id}}/card/">Печать</a></strong>
+  </div>
+
     </div><!-- .panel-body -->
 </div><!-- .panel-danger -->
+

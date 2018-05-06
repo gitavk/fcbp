@@ -1,0 +1,171 @@
+{% load staticfiles %}
+{% load core_extras %}
+{% load client_extras %}
+<!DOCTYPE html>
+<html lang="en" ng-app="fcbp">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}Печать{% endblock %}</title>
+    <link href="{% static "bootstrap-3/css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "font-awesome-4/css/font-awesome.min.css" %}" rel="stylesheet">
+    <link href="{% static_version "css/style-print.css" %}" rel="stylesheet">
+    {% block extra_head %}
+    {% endblock %}
+  </head>
+  <body class="print">
+    <center>
+        <a href="/#/usepersonal/{{ card.id }}" class="no-print btn btn-info" 
+        type="button">
+            <i class="fa fa-credit-card"></i> назад в карту
+        </a>
+        <a href="#btnPrint" class="no-print btn btn-primary " 
+        type="button" id="btnPrint">
+            <i class="fa fa-print"></i> печать
+        </a>
+    </center>
+{% for i in '01' %}
+    <table width="800">
+        <tr>
+            <td align="center">
+                <strong>{{ text.title }}</strong>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" align="left">
+                Санкт-Петербург
+            </td>
+            <td width="40"></td>
+            <td width="40"><strong>{{ card.date|date:"d.m.Y" }}</strong></td>
+        </tr>
+        <tr>
+            <td colspan="6" align="justify">
+            {{ text.header }}
+            </td>
+        </tr>
+    </table>
+    <table class="table-print" style="border:black solid;">
+        <tr>
+            <td width="300"><strong>{{ card.client.last_name }}</strong></td>
+            <td width="170"><strong>{{ card.client.first_name }}</strong></td>
+            <td width="170"><strong>{{ card.client.patronymic }}</strong></td>
+            <td >ЧС</td>
+            <td width="130"><strong>{{ card.client.uid }}</strong></td>
+        </tr>
+        <tr>
+            <td>Дата рождения <strong>{{ card.client.born | date:"d.m.Y" }}</strong></td>
+            <td colspan="2">№ паспорта &nbsp;&nbsp;&nbsp; <strong>{{ card.client.passport_number|default:"" }}</strong></td>
+            <td>карта</td>
+            <td><strong>{{ card.client.card|default:"" }}</strong></td>
+        </tr>
+    </table>
+
+    <!-- Add info for external clients -->
+    {% for ec in card.extra_clients.all %}
+    <table class="table-print" style="border:black solid;">
+        <tr>
+            <td width="300"><strong>{{ec.client.last_name }}</strong></td>
+            <td width="170"><strong>{{ ec.client.first_name }}</strong></td>
+            <td width="170"><strong>{{ ec.client.patronymic }}</strong></td>
+            <td >ЧС</td>
+            <td width="130"><strong>{{ ec.client.uid }}</strong></td>
+        </tr>
+        <tr>
+            <td>Дата рождения <strong>{{ ec.client.born | date:"d.m.Y" }}</strong></td>
+            <td colspan="2">№ паспорта &nbsp;&nbsp;&nbsp; <strong>{{ ec.client.passport_number|default:"" }}</strong></td>
+            <td>карта</td>
+            <td><strong>{{ ec.client.card|default:"" }}</strong></td>
+        </tr>
+    </table>
+    {% endfor %}
+
+    <table width="800">
+        <tr>
+            <td>
+                {{ text.additional_header }}
+            </td>
+        </tr><tr>
+            <td>
+            1. {{ text.item1 }}:
+            </td>
+        </tr>
+    </table>
+    <table class="table-print">
+        <tr>
+            <td width="240">вид клип-карты</td>
+            <td width="180">базовая стоимость</td>
+            <td width="180">кол.тренировок</td>
+            <td colspan="2" width="200">рассрочка платежа</td>
+        </tr>
+        <tr>
+            <td rowspan="2"><strong>{{ card.personal.name }}</strong></td>
+            <td rowspan="2"><strong>{{ card.personal.price }}</strong></td>
+            <td rowspan="2"><strong>{{ card.personal.max_visit }}</td>
+            <td>{{ payments.1.0| date:"d.m.Y" }}</td>
+            <td>{{ payments.1.1| default:'' }}</td>
+        </tr>
+        <tr>
+            <td>{{ payments.2.0| date:"d.m.Y" }}</td>
+            <td>{{ payments.2.1| default:'' }}</td>
+        </tr>                    
+        <tr>
+            <td>оплачено, руб</td>
+            <td colspan="2">Срок действия</td>
+            <td>{{ payments.3.0| date:"d.m.Y" }}</td>
+            <td>{{ payments.3.1| default:'' }}</td>
+        </tr>
+        <tr>
+            <td><strong>{{ card | first_paymet }}</strong></td>
+            <td colspan="2" rowspan="2">
+                <strong>{{ card.date_begin| date:"d.m.Y" }} - {{ card.date_end| date:"d.m.Y" }}</strong>
+            </td>
+            <td rowspan="2" colspan="2">
+                При задержке платежа клип-карта считается недействительной
+            </td>
+        </tr>
+        <tr>
+            <td><strong>{{ card| first_paymet_date | date:"d.m.Y" }}</strong></td>
+        </tr>
+
+    </table>
+    <table width="800">
+        {% for item in text.cardtextitems_set.all %}
+        <tr>
+            <td>
+                {{ forloop.counter|add:"1" }}. {{ item.item }}
+            </td>
+        </tr>
+          
+        {% endfor %}
+    </table>
+  <table width="800">
+    <tr>
+        <td>Исполнитель</td>
+        <td><span class="pull-right">{{ text.employee }}</span></td>
+        <td><span class="pull-right">Член клуба</span></td>
+        <td width="300"><span class="pull-right">{{ card.client.initials }}</span></td>
+    </tr>
+    <tr>
+        <td>телефон</td>
+        <td><span class="pull-right">{{ text.phone }}</span></td>
+        <td><span class="pull-right">телефон</span></td>
+        <td><span class="pull-right">{{ card.client.mobile| default:'' | phone  }}</span></td>
+    </tr>
+  </table>
+{% if i == '0' %}
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+{% endif %}
+{% endfor %}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="{% static "jquery/jquery-2.1.4.min.js" %}"></script>
+    <script type="text/javascript">
+    $("#btnPrint").click(function() {
+        window.print()
+    });
+    </script>
+  </body>
+</html>

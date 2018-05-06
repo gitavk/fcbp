@@ -398,11 +398,36 @@ class ClientTicketViewSet(
         return TemplateResponseMixin.render_to_response(self, cont)
 
 
-class ClientPersonalViewSet(viewsets.ModelViewSet):
+class ClientPersonalViewSet(viewsets.ModelViewSet, TemplateResponseMixin):
     queryset = ClientPersonal.objects.order_by('-date')
     serializer_class = ClientPersonalSerializer
     serializer_similar = PersonalSerializer
     finance_obj = 'personal'
+
+    @detail_route(methods=['get'], )
+    def card(self, request, pk):
+        """
+        Print form of the card.
+        """
+        card = self.get_object()
+        pre_payments = []
+        for p in card.payment_set.all().order_by('date'):
+            pre_payments.append((p.date, p.amount))
+        for cr in card.credit_set.all().order_by('schedule'):
+            pre_payments.append((cr.schedule, cr.amount))
+        # rebuild payments to four elements
+        payments = []
+        for k, v in map(None, pre_payments, '*'*4):
+            if k is not None:
+                payments.append(k)
+            else:
+                payments.append((None, None))
+        text = CardText.objects.filter(text_type=2).first()
+        cont = {'card': card, 'payments': payments, 'text': text}
+        card.printed = True
+        card.save()
+        self.template_name = 'card/personal.html'
+        return TemplateResponseMixin.render_to_response(self, cont)
 
     @detail_route(methods=['post'], )
     def add_extra(self, request, pk):
