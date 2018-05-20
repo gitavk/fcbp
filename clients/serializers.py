@@ -374,6 +374,7 @@ class ClientPersonalSerializer(serializers.ModelSerializer):
         source='client.uid', read_only=True)
     client_card = serializers.IntegerField(
         source='client.card', read_only=True)
+    rest_visits = serializers.CharField(read_only=True)
     credit_set = CreditSerializer(many=True, read_only=True)
     payment_set = PaymentSerializer(many=True, read_only=True)
     prolongation = ProlongationPersonalSerializer(many=True, read_only=True)

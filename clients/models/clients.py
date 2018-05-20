@@ -1271,7 +1271,6 @@ class UseClientPersonal(models.Model):
             ucc = self.club_card_visit
             ucc.end = self.end
             ucc.save()
-            print(ucc)
 
         if self.end and self.client_personal.rest_visits < 1:
             # set status not activate
