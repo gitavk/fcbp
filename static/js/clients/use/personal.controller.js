@@ -39,6 +39,9 @@
     vm.payment = payment;
     vm.update_type = update_type;
 
+    vm.reopen = reopen;
+    vm.archive_purge_credits = archive_purge_credits;
+
     activate();
 
     /**
@@ -453,6 +456,48 @@
       function activationErrorFn(data, status, headers, config) {
         console.log(data);
       }
+    };
+
+    // reopen old card
+    function reopen() {
+      Personals.archive_reopen(vm.uid).then(reopenSuccessFn, reopenErrorFn);
+
+      /**
+      * @name reopenSuccessFn
+      * @desc Update Personals array on view
+      */
+      function reopenSuccessFn(data, status, headers, config) {
+        window.location = '/#/usepersonal/' + vm.uid
+      }
+
+      /**
+      * @name reopenErrorFn
+      * @desc console log error
+      */
+      function reopenErrorFn(data, status, headers, config) {
+        console.log(data);
+      };
+    };
+
+    // purge credits for old card
+    function archive_purge_credits() {
+      Personals.archive_purge_credits(vm.uid).then(purgeSuccessFn, purgeErrorFn);
+
+      /**
+      * @name purgeSuccessFn
+      * @desc Update Personals array on view
+      */
+      function purgeSuccessFn(data, status, headers, config) {
+        activate()
+      };
+
+      /**
+      * @name purgeErrorFn
+      * @desc console log error
+      */
+      function purgeErrorFn(data, status, headers, config) {
+        console.log(data);
+      };
     };
 
   };

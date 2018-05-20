@@ -1,13 +1,13 @@
 <div class="col-md-4"> <!-- start left side bar -->
-<div class="col-md-12 row-border ">
-  <h4>
-  <i class="fa fa-credit-card">
-  </i> Клубная Карта: {{ vm.card.name }} </h4>
-  <h4><u>{{ vm.card.client_name }}</u></h4>
-  <h4>ЧС: {{ vm.card.client_uid }}</h4>
-  <h4>Карта: {{ vm.card.client_card }}</h4>
-  <h4>{{ vm.card.client_mobile | phone }}</h4>
-</div>
+  <div class="col-md-12 row-border ">
+    <h4>
+    <i class="fa fa-credit-card">
+    </i> Клубная Карта: {{ vm.card.name }} </h4>
+    <h4><u>{{ vm.card.client_name }}</u></h4>
+    <h4>ЧС: {{ vm.card.client_uid }}</h4>
+    <h4>Карта: {{ vm.card.client_card }}</h4>
+    <h4>{{ vm.card.client_mobile | phone }}</h4>
+  </div>
   <div class="row-border col-md-12">
     <h5 ng-show="vm.card.is_paid_activate" class="bg-success">Платная активация</h5>
     <h4>

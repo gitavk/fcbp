@@ -1,6 +1,5 @@
 
 <div class="col-md-4 left-menu-block">
-
   <div class="col-md-12 row-border">
     <h4>
     <i class="fa fa-graduation-cap">
@@ -46,10 +45,9 @@
         {{ vm.personal.instructor_name }}
       </h4>
     </div>
-  </div>
-<!-- end instructor -->
+  </div><!-- end instructor -->
 
-<!-- prolongation -->
+  <!-- prolongation -->
   <div class="panel panel-default col-md-12">
     <div class="panel-heading"><strong>Продление</strong></div>
     <div class="panel-body">
@@ -63,10 +61,9 @@
         </tr>
       </table>
     </div>
-  </div>
-<!-- end prolongation -->
+  </div><!-- end prolongation -->
 
-<!-- ChangeOwner -->
+  <!-- ChangeOwner -->
   <div class="panel panel-default col-md-12">
     <div class="panel-heading"><strong>Переоформление</strong></div>
     <div class="panel-body">
@@ -80,12 +77,8 @@
         </tr>
       </table>
     </div>
-  </div>
-<!-- End ChangeOwner -->
-
-
-</div>
-<!-- .left menu block -->
+  </div><!-- End ChangeOwner -->
+</div><!-- .left menu block -->
 
 <div class="col-md-8 main-block">
  
@@ -93,33 +86,85 @@
     <div class="col-md-3">
       <a href="#/cardclient/{{ vm.personal.client}}/" class="btn btn-default btn-block"> Вернуться в карту</a>
     </div>
+    <div class="col-md-3">
+      <button class="btn btn-block btn-danger" ng-click="vm.reopen()">
+        Активировать
+      </button>
+    </div>
   </div>  <!-- row -->
 
-    <div class="row">
-      <div class="col-md-3"><center>дата</center></div>
-      <div class="col-md-2">время</div>
-      <div class="col-md-2">окончание</div>
-      <div class="col-md-3">Инструктор</div>
-    </div>
-    <div ng-repeat="use in vm.personal.visits"
-         ng-click="collapsed=!collapsed">
-        <div class="col-md-3"> {{ use.date | date:'dd.MM.yyyy' }} </div>
-        <div class="col-md-2"> {{ use.date | date:'HH:mm' }} </div>
-        <div class="col-md-2"> {{ use.end | date:'HH:mm' }} </div>
-        <div class="col-md-3"> {{ use.instructor|| "-" }} </div>
-        <div class="col-md-1 hide">
-          <a class="fa fa-edit text-yellow pull-left" href="#/editvisit/{{ use.id }}/">
-          </a>
-        </div>
-        <div class="col-md-1 hide">
-          <i class="fa fa-recycle cursor-pointer text-red pull-right" ng-click="vm.use_del(use.id)"></i>
-        </div>
-    </div>  <!-- row -->
+  <div class="row">
+    <div class="col-md-3"><center>дата</center></div>
+    <div class="col-md-2">время</div>
+    <div class="col-md-2">окончание</div>
+    <div class="col-md-3">Инструктор</div>
+  </div>
+  <div ng-repeat="use in vm.personal.visits"
+       ng-click="collapsed=!collapsed">
+      <div class="col-md-3"> {{ use.date | date:'dd.MM.yyyy' }} </div>
+      <div class="col-md-2"> {{ use.date | date:'HH:mm' }} </div>
+      <div class="col-md-2"> {{ use.end | date:'HH:mm' }} </div>
+      <div class="col-md-3"> {{ use.instructor|| "-" }} </div>
+      <div class="col-md-1 hide">
+        <a class="fa fa-edit text-yellow pull-left" href="#/editvisit/{{ use.id }}/">
+        </a>
+      </div>
+      <div class="col-md-1 hide">
+        <i class="fa fa-recycle cursor-pointer text-red pull-right" ng-click="vm.use_del(use.id)"></i>
+      </div>
+  </div>  <!-- row -->
 
 </div><!-- .main block -->
 
 <!-- payment info -->
-<div class="panel panel-info col-md-12">
+<div class="panel panel-info col-md-12"  ng-show="vm.personal.payment_set.length || vm.personal.credit_set.length">
+
+  <!-- Credits -->
+  <div class="panel panel-danger col-md-12" ng-show="vm.personal.credit_set.length">
+    <div class="panel-heading"><strong>Долги</strong></div>
+    <div class="panel-body">
+      <table class="table">
+        <tr>
+          <td colspan="3">
+            <button class="btn btn-block btn-danger" ng-click="vm.archive_purge_credits()">
+              Очистить все долги
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-md-3">Дата</td><td class="col-md-3">Сумма</td><td></td><td></td>
+        </tr>
+        <tr ng-repeat="cr in vm.personal.credit_set">
+          <td> {{ cr.date | date:'dd.MM.yyyy' }} </td>
+          <td> {{ cr.amount }} руб.</td>
+                  <td>
+          <button class="btn btn-warning btn-sm"
+          ng-click="show_pay_type=!show_pay_type">
+            Оплатить
+          </button>
+        </td>
+        <td>
+          <div ng-show="show_pay_type">
+            <button class="btn btn-danger btn-xs" ng-click="vm.payment(1, cr.id)">
+            нал.
+            </button>
+            <button class="btn btn-danger btn-xs" ng-click="vm.payment(2, cr.id)">
+             безнал.
+            </button>
+            <button class="btn btn-danger btn-xs" ng-click="vm.payment(3, cr.id)">
+             банк
+            </button>
+            <button class="btn btn-danger btn-xs" ng-click="vm.payment(0, cr.id)">
+             иное
+            </button>
+          </div>
+        </td>
+        </tr>
+      </table>
+    </div>
+  </div><!-- end Credits -->
+
+  <!-- Payments -->
   <div class="panel-heading"><strong>Платежи</strong></div>
   <div class="panel-body">
     <table class="table">
@@ -178,5 +223,5 @@
         </td>
       </tr>
     </table>
-  </div>
+  </div>  <!-- End payments -->
 </div> <!-- end payment info -->

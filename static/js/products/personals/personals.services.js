@@ -38,6 +38,8 @@
       ownerp: ownerp,
       add_extra: add_extra,
       archive_client_list: archive_client_list,
+      archive_reopen: archive_reopen,
+      archive_purge_credits: archive_purge_credits
     };
 
     return Personals;
@@ -141,6 +143,14 @@
 
     function ownerp(fdata) {
       return $http.post('/api/v1/clients/ownerp/', fdata)
+    }
+
+    function archive_reopen(uid) {
+      return $http.post('/api/v1/clients/archive/personal/'+ uid + '/reopen/')
+    }
+
+    function archive_purge_credits(uid) {
+      return $http.post('/api/v1/clients/archive/personal/'+ uid + '/purge_credits/')
     }
 
   }
