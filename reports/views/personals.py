@@ -22,6 +22,7 @@ class ActivePersonal(Report):
     table_headers = [
         (_('client'), 6000),
         (_('# uid'), 2000),
+        (_('card number'), 2000),
         (_('phone'), 4000),
         (_('tariff'), 6000),
         (_('attribute'), 2000),
@@ -39,10 +40,10 @@ class ActivePersonal(Report):
     ]
 
     table_styles = {
-        6: styles.styled,
         7: styles.styled,
-        9: styles.styled,
-        13: styles.style_cw
+        8: styles.styled,
+        10: styles.styled,
+        14: styles.style_cw
     }
 
     def initial(self, request, *args, **kwargs):
@@ -73,6 +74,7 @@ class ActivePersonal(Report):
         for row in data:
             fname = row.client.full_name
             uid = row.client.uid
+            card = row.client.card
             phone = row.client.mobile or row.client.phone or ''
             tariff = row.personal.short_name
             amount = row.summ_amount
@@ -112,8 +114,9 @@ class ActivePersonal(Report):
             self.total_main_rows += 1
             self.products[tariff] += 1
             rows.append((
-                fname, uid, phone, tariff, 1, amount, date_begin, date_end,
-                len(visits), last_visit, prolongation, cc_name, cc_period,
+                fname, uid, card, phone, tariff, 1, amount,
+                date_begin, date_end, len(visits), last_visit,
+                prolongation, cc_name, cc_period,
                 schedule, main_ecs, instructor
             ))
             # lines for extra xlients
