@@ -23,6 +23,7 @@ class Sales(Report):
         (_('time'), 2000),
         (_('client'), 8000),
         (_('co number'), 4000),
+        (_('card number'), 2000),
         (_('tariff'), 6000),
         (_('full price'), 4000),
         (_('discount'), 4000),
@@ -35,8 +36,8 @@ class Sales(Report):
 
     table_styles = {
         0: styles.stylet,
-        4: styles.stylef,
-        7: styles.stylef,
+        5: styles.stylef,
+        8: styles.stylef,
     }
 
     def get_fdate(self):
@@ -63,6 +64,7 @@ class Sales(Report):
             line.append(row.date.strftime('%H:%M'))
             line.append(row.client.full_name)
             line.append(row.client.uid)
+            line.append(row.client.card)
             line.append(row.goods_short_name())
             if not row.extra_uid:
                 line.append(card.club_card.price)

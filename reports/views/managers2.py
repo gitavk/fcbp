@@ -475,6 +475,7 @@ class PeriodSales(Report):
         (_('time'), 2000),
         (_('client'), 8000),
         (_('co number'), 4000),
+        (_('card number'), 2000),
         (_('tariff'), 6000),
         (_('full price'), 4000),
         (_('discount'), 4000),
@@ -488,8 +489,8 @@ class PeriodSales(Report):
     table_styles = {
         0: styles.styled,
         1: styles.stylet,
-        4: styles.stylef,
-        7: styles.stylef,
+        6: styles.stylef,
+        9: styles.stylef,
     }
 
     def initial(self, request, *args, **kwargs):
@@ -526,6 +527,7 @@ class PeriodSales(Report):
             line.append(row.date.strftime('%H:%M'))
             line.append(row.client.full_name)
             line.append(row.client.uid)
+            line.append(row.client.card)
             line.append(row.first_goods.short_name)
             if not row.extra_uid:
                 line.append(card.club_card.price)

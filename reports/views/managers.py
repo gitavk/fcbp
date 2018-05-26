@@ -388,6 +388,7 @@ class FullList(CommonList):
         (_('# on item'), 2000),
         (_('client'), 8000),
         (_('# uid'), 4000),
+        (_('card number'), 2000),
         (_('birthday'), 4000),
         (_('mobile'), 7000),
         (_('period cards'), 12000),
@@ -417,6 +418,7 @@ class FullList(CommonList):
             line.append(num)
             line.append(row.full_name)
             line.append(row.uid)
+            line.append(row.card)
             try:
                 line.append(row.born.strftime('%d.%m.%Y'))
             except Exception as e:

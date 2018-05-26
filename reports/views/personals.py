@@ -219,11 +219,12 @@ class UsePersonals(Report):
             data = data.filter(instructor=self.instructor)
         for row in data:
             client = row.client_personal.client.full_name
+            card = row.client_personal.client.card
             tariff = row.client_personal.product.short_name
             self.products[tariff] += 1
             instructor = row.instructor.initials if row.instructor else ''
             rows.append((
-                row.date, row.date.strftime('%H:%M'), row.client_personal.pk,
+                row.date, row.date.strftime('%H:%M'), card,
                 client, tariff, instructor
             ))
         return rows
