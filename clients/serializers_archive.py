@@ -69,6 +69,9 @@ class ClientClubCardSerializer(serializers.ModelSerializer):
     prolongation = ProlongationClubCardSerializer(many=True, read_only=True)
     credit_set = CreditSerializer(many=True, read_only=True)
     payment_set = PaymentSerializer(many=True, read_only=True)
+    discount_description = serializers.CharField(read_only=True)
+    discount_amount = serializers.FloatField(read_only=True)
+    bonus_amount = serializers.FloatField(read_only=True)
 
     class Meta:
         list_serializer_class = ArchiveListSerializer
@@ -181,6 +184,9 @@ class ClientPersonalSerializer(serializers.ModelSerializer):
         source='client.card', read_only=True)
     credit_set = CreditSerializer(many=True, read_only=True)
     payment_set = PaymentSerializer(many=True, read_only=True)
+    discount_description = serializers.CharField(read_only=True)
+    discount_amount = serializers.FloatField(read_only=True)
+    bonus_amount = serializers.FloatField(read_only=True)
     prolongation = ProlongationPersonalSerializer(many=True, read_only=True)
     rest_prolongation = serializers.IntegerField(read_only=True)
     is_online = serializers.IntegerField(read_only=True)

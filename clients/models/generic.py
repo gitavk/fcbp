@@ -92,6 +92,33 @@ class Property(object):
             amount += csum.get('sum', 0)
         return amount
 
+    @property
+    def discount_value(self):
+        if self.discount_type:
+            return self.discount_amount
+        elif self.bonus_type:
+            return self.bonus_amount
+        else:
+            return ''
+
+    @property
+    def discount_short(self):
+        if self.discount_type:
+            return self.discount_type.short
+        elif self.bonus_type:
+            return self.bonus_type.short
+        else:
+            return ''
+
+    @property
+    def discount_description(self):
+        if self.discount_type:
+            return self.discount_type.description
+        elif self.bonus_type:
+            return self.bonus_type.description
+        else:
+            return ''
+
     def full_name(self):
         return self.product.full_name
 

@@ -261,33 +261,6 @@ class ClientClubCard(Property, WritePayment, models.Model):
             return ''
 
     @property
-    def discount_value(self):
-        if self.discount_type:
-            return self.discount_amount
-        elif self.bonus_type:
-            return self.bonus_amount
-        else:
-            return ''
-
-    @property
-    def discount_short(self):
-        if self.discount_type:
-            return self.discount_type.short
-        elif self.bonus_type:
-            return self.bonus_type.short
-        else:
-            return ''
-
-    @property
-    def discount_description(self):
-        if self.discount_type:
-            return self.discount_type.description
-        elif self.bonus_type:
-            return self.bonus_type.description
-        else:
-            return ''
-
-    @property
     def period(self):
         if self.club_card.period.is_month:
             return u'%s месяцев' % self.club_card.period.value
@@ -965,7 +938,16 @@ class ClientPersonal(Property, models.Model):
     instructor = models.ForeignKey(Employee, blank=True, null=True)
     block_comment = models.CharField(max_length=150, blank=True, null=True)
     status = models.SmallIntegerField(default=2, blank=True, )
+    discount_type = models.ForeignKey(Discount, blank=True, null=True,
+                                      related_name="personals")
+    discount_amount = models.FloatField(blank=True, null=True)
+    bonus_type = models.ForeignKey(Discount, blank=True, null=True,
+                                   related_name="personals_bonus_type")
+    bonus_amount = models.FloatField(blank=True, null=True)
+    employee = models.ForeignKey(Employee, blank=True, null=True,
+        related_name="personals_emp")
     printed = models.BooleanField(default=False)
+
     """
     status valid data:
     0 - disabled

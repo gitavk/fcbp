@@ -164,6 +164,17 @@
     </div>
   </div><!-- end Credits -->
 
+  <div class="panel panel-default col-md-12"
+   ng-show="vm.personal.discount_amount || vm.personal.bonus_amount"> <!-- start bonus info -->
+    <div class="panel-heading"><strong>Бонусы при покупке</strong></div>
+    <span class="col-md-6" ng-show="vm.personal.discount_amount">
+      <strong>Скидка({{ vm.personal.discount_description }}): {{ vm.personal.discount_amount }} %</strong>
+    </span>
+    <span class="col-md-6" ng-show="vm.personal.bonus_amount">
+      <strong>Бонус({{ vm.personal.discount_description }}): {{ vm.personal.bonus_amount }} руб.</strong>
+    </span>
+  </div> <!-- end bonus info -->
+
   <!-- Payments -->
   <div class="panel-heading"><strong>Платежи</strong></div>
   <div class="panel-body">

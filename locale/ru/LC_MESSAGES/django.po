@@ -122,6 +122,9 @@ msgstr "пояснение"
 msgid "all card sales"
 msgstr "всего продаж карт"
 
+msgid "all personal sales"
+msgstr "всего продаж клип- карт"
+
 msgid "Administrator"
 msgstr "Администратор"
 

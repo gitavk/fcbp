@@ -495,7 +495,11 @@ class PeriodSales(Report):
 
     def initial(self, request, *args, **kwargs):
         super(PeriodSales, self).initial(request, *args, **kwargs)
-        self.total_payments = dict.fromkeys(Payment.payment_types.keys(), 0)
+        payment_types = dict.fromkeys(Payment.payment_types.keys(), 0)
+        self.total_payments = {
+            'card': payment_types.copy(),
+            'personal': payment_types.copy(),
+        }
 
     def get_title(self, **kwargs):
         msg = _(
@@ -517,12 +521,14 @@ class PeriodSales(Report):
         rows = []
         fdate = self.get_fdate().date()
         end_date = self.get_tdate() + timedelta(1)
-        data = Payment.objects.filter(
+        qs = Payment.objects.filter(
             date__range=(fdate, end_date)
-        ).exclude(club_card__isnull=True).exclude(payment_type=3)
+        ).exclude(payment_type=3)
+        data = qs.exclude(club_card__isnull=True)
+        data |= qs.exclude(personal__isnull=True)
         for row in data:
             line = []
-            card = row.club_card
+            card = row.club_card or row.personal
             line.append(row.date)
             line.append(row.date.strftime('%H:%M'))
             line.append(row.client.full_name)
@@ -530,7 +536,7 @@ class PeriodSales(Report):
             line.append(row.client.card)
             line.append(row.first_goods.short_name)
             if not row.extra_uid:
-                line.append(card.club_card.price)
+                line.append(card.price())
                 line.append(card.discount_value)
                 line.append(card.discount_short)
             else:
@@ -540,7 +546,10 @@ class PeriodSales(Report):
             line.append(row.amount)
             ptype = Payment.payment_types.get(row.payment_type)
             line.append(ptype)
-            self.total_payments[row.payment_type] += row.amount
+            if row.club_card:
+                self.total_payments['card'][row.payment_type] += row.amount
+            else:
+                self.total_payments['personal'][row.payment_type] += row.amount
             schedule = []
             for p in card.schedule_payments():
                 if p[0] <= row.date:
@@ -554,11 +563,17 @@ class PeriodSales(Report):
             rows.append(line)
         return rows
 
-    def write_bottom(self):
-        self.ws.write(self.row_num, 2, _('all card sales'))
-        self.ws.write(self.row_num, 4, sum(self.total_payments.values()))
+    def _bottom_details(self, details):
+        self.ws.write(self.row_num, 4, sum(details.values()))
         self.row_num += 1
         for x in (1, 2, 0):
             self.ws.write(self.row_num, 2, Payment.payment_types[x])
-            self.ws.write(self.row_num, 4, self.total_payments[x])
+            self.ws.write(self.row_num, 4, details[x])
             self.row_num += 1
+
+    def write_bottom(self):
+        self.ws.write(self.row_num, 2, _('all card sales'))
+        self._bottom_details(self.total_payments.get('card', {}))
+        self.row_num += 1
+        self.ws.write(self.row_num, 2, _('all personal sales'))
+        self._bottom_details(self.total_payments.get('personal', {}))
