@@ -8,7 +8,7 @@ from .base import ReportTemplate, Report
 from reports import styles
 from clients.models import (
     ClientClubCard, UseClientClubCard, Client, ClubCardTrains,
-    FitnessClubCard, PersonalClubCard)
+    FitnessClubCard, PersonalClubCard, ClientPersonal)
 from products.models import ClubCard
 from finance.models import Payment, Credit
 
@@ -349,34 +349,42 @@ class CommonList(Report):
         fdate = self.get_fdate().strftime('%d.%m.%Y')
         tdate = self.get_tdate().strftime('%d.%m.%Y')
         msg = msg.format(fdate=fdate, tdate=tdate)
-        self.ws.write_merge(1, 1, 0, 5, msg, styles.styleh)
+        self.ws.write_merge(1, 1, 0, 6, msg, styles.styleh)
 
     def get_data(self):
         rows = []
         fdate = self.get_fdate().date()
         tdate = self.get_tdate().date() + timedelta(1)
-        data = ClientClubCard.objects.filter(
+        client_cc = ClientClubCard.objects.filter(
             date__range=(fdate, tdate)
-        ).extra(
+            ).values_list('client', flat=True)
+        client_p = ClientPersonal.objects.filter(
+            date__range=(fdate, tdate)
+            ).values_list('client', flat=True)
+        cids = set(list(client_cc) + list(client_p))
+        data = Client.objects.extra(
             select={'lower_name': 'lower(clients_client.last_name)'}
-        ).values_list('client', 'lower_name', 'client__last_name'
-                      ).distinct().order_by('lower_name')
+            ).filter(pk__in=cids).order_by('lower_name')
+
         for num, row in enumerate(data, 1):
             line = []
             line.append(num)
-            client = Client.objects.get(pk=row[0])
-            line.append(client.full_name)
-            line.append(client.uid)
-            line.append(client.born.strftime('%d.%m.%Y'))
-            line.append(CommonList.format_mobile(client.mobile))
-            cards = client.clientclubcard_set.filter(
-                date__range=(fdate, tdate))
-            if cards:
-                cards = cards.values_list('club_card__short_name', flat=True)
-                line.append(", ".join(cards))
+            line.append(row.full_name)
+            line.append(row.uid)
+            line.append(row.born.strftime('%d.%m.%Y'))
+            line.append(CommonList.format_mobile(row.mobile))
+            cards = row.clientclubcard_set.filter(
+                date__range=(fdate, tdate)
+                ).values_list('club_card__short_name', flat=True)
+            personals = row.clientpersonal_set.filter(
+                date__range=(fdate, tdate)
+                ).values_list('personal__short_name', flat=True)
+            plist = list(cards) + list(personals)
+            if plist:
+                line.append(", ".join(plist))
             else:
                 line.append('')
-            line.append(client.email)
+            line.append(row.email)
             rows.append(line)
         return rows
 
