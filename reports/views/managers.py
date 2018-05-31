@@ -18,11 +18,12 @@ class ActiveClubCard(ReportTemplate):
     file_name = 'list_active_club_cards'
     sheet_name = 'report'
     tpl_path = 'xls_tpl/active_clubcard.xls'
-    tpl_start_row = 8
+    tpl_start_row = 7
 
     table_headers = [
         (_('client'), 4000),
-        (_('club card'), 10000),
+        (_('club card'), 4000),
+        (_('tarif'), 10000),
         (_('dates'), 4000),
         (_('use trainings'), 6000),
         (_('last visit'), 4000),
@@ -64,8 +65,8 @@ class ActiveClubCard(ReportTemplate):
             pname = row.client.patronymic
             lname = row.client.last_name
             uid = row.client.uid
-            card = row.client.card
-            line.append((fname, pname, lname, uid, card))
+            line.append((fname, pname, lname, uid))
+            line.append(('', '', '', row.client.card))
             phone = row.client.mobile or row.client.phone or ''
             tariff = row.club_card.short_name
             amount = row.summ_amount
@@ -76,18 +77,18 @@ class ActiveClubCard(ReportTemplate):
                     val=row.discount_value, dtype=dtype)
             else:
                 discount = ''
-            line.append((phone, tariff, amount, discount, ''))
+            line.append((phone, tariff, amount, discount))
             date_begin = row.date_begin.strftime('%d.%m.%Y')
             date_end = row.date_end.strftime('%d.%m.%Y')
-            line.append((date_begin, date_end, '', '', ''))
+            line.append((date_begin, date_end, '', ''))
             visits = row.visits.all()
             training = ClubCardTrains.objects.filter(visit__in=visits).count()
-            line.append((training, '', '', ''))
+            line.append((training, '', ''))
             if visits:
                 last_visit = visits.last().date.strftime('%d.%m.%Y')
-                line.append((last_visit, '', '', '', ''))
+                line.append((last_visit, '', '', ''))
             else:
-                line.append(('', '', '', '', ''))
+                line.append(('', '', '', ''))
             schedule = []
             for p in row.schedule_payments():
                 if p[0] <= self.get_fdate():
@@ -95,7 +96,7 @@ class ActiveClubCard(ReportTemplate):
                 pdate = p[0].strftime('%d.%m.%Y')
                 pamount = "{:,}".format(p[1]).replace(',', ' ')
                 schedule.append("%s - %s" % (pamount, pdate))
-            schedule.extend([''] * (5 - len(schedule)))
+            schedule.extend([''] * (4 - len(schedule)))
             line.append(schedule)
             freeze = []
             use_freeze = row.freeze.all()
@@ -104,7 +105,7 @@ class ActiveClubCard(ReportTemplate):
             use_prol = row.prolongation.all()
             for p in use_prol.filter(is_extra=False, is_paid=False):
                 freeze.append(p.days)
-            freeze.extend([''] * (5 - len(freeze)))
+            freeze.extend([''] * (4 - len(freeze)))
             line.append(freeze)
             fitness = row.fitnessclubcard_set.first()
             fitness = fitness.date.strftime('%d.%m.%Y') if fitness else ''
@@ -114,7 +115,7 @@ class ActiveClubCard(ReportTemplate):
             guests = []
             for guest in row.guestclubcard_set.all().order_by('date'):
                 guests.append(guest.date.strftime('%d.%m.%Y'))
-            guests.extend([''] * (5 - len(guests)))
+            guests.extend([''] * (4 - len(guests)))
             line.append(guests)
             rows.append(line)
         self.total_rows = len(rows)
