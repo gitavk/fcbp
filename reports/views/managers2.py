@@ -134,7 +134,7 @@ class TotalActiveClubCard(TotalClubCard):
         return cards.values_list('pk', flat=True)
 
 
-class ClubCardDiscount(Report):
+class Discount(Report):
 
     file_name = 'club_cards_discounts'
     sheet_name = 'club_cards_discounts'
@@ -157,14 +157,14 @@ class ClubCardDiscount(Report):
     }
 
     def initial(self, request, *args, **kwargs):
-        super(ClubCardDiscount, self).initial(request, *args, **kwargs)
+        super(Discount, self).initial(request, *args, **kwargs)
         self.total = {}
 
     def get_title(self, **kwargs):
         return _('club cards discounts')
 
     def write_title(self):
-        super(ClubCardDiscount, self).write_title()
+        super(Discount, self).write_title()
         msg = _('from: {fdate} to {tdate}')
         fdate = self.get_fdate().strftime('%d.%m.%Y')
         tdate = self.get_tdate().strftime('%d.%m.%Y')
@@ -177,35 +177,31 @@ class ClubCardDiscount(Report):
         cards = []
         fdate = self.get_fdate().date()
         tdate = self.get_tdate().date() + timedelta(1)
-        payments = Payment.objects.filter(
-            date__range=(fdate, tdate)
-        ).exclude(club_card__isnull=True)
+        pqs = Payment.objects.filter(date__range=(fdate, tdate)
+            ).order_by('date')
+        payments = pqs.exclude(club_card__isnull=True)
+        payments |= pqs.exclude(personal__isnull=True)
         for p in payments:
-            if p.club_card.first_payment == p:
-                cards.append(p.club_card.pk)
-        discounts = ClientClubCard.objects.filter(
-            pk__in=cards, discount_amount__gt=0)
-        bonus = ClientClubCard.objects.filter(
-            pk__in=cards, bonus_amount__gt=0)
-        data = discounts | bonus
-        data = data.distinct()
-        for row in data:
+            product = p.first_goods
+            discount = product.discount_amount or product.bonus_amount
+            if product.first_payment != p or not discount:
+                continue
             line = []
-            line.append(row.client.full_name)
-            line.append(row.client.uid)
-            line.append(row.club_card.short_name)
-            line.append(row.first_payment.date)
-            line.append(row.discount_short)
-            if row.discount_short not in self.total:
-                self.total[row.discount_short] = 1
+            line.append(product.client.full_name)
+            line.append(product.client.uid)
+            line.append(product.product.short_name)
+            line.append(product.first_payment.date)
+            line.append(product.discount_short)
+            if product.discount_short not in self.total:
+                self.total[product.discount_short] = 1
             else:
-                self.total[row.discount_short] += 1
-            discount_value = row.discount_value
+                self.total[product.discount_short] += 1
+            discount_value = product.discount_value
             if discount_value <= 100:
                 discount_value = ('{value} %').format(value=discount_value)
             line.append(discount_value)
             rows.append(line)
-        return sorted(rows, key=lambda row: row[4])
+        return rows
 
     def write_bottom(self):
         self.ws.write(self.row_num, 0, _('total'))
