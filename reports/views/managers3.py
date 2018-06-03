@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from reports import styles
 from clients.models import (
     ProlongationClubCard, UseClientClubCard, ClubCardTrains, ClientClubCard,
-    FreezeClubCard)
+    FreezeClubCard, UseClientPersonal)
 from finance.models import Payment
 from products.models import Training
 from .base import ReportTemplate, Report
@@ -138,6 +138,13 @@ class VisitsPeriod(Report):
             workout = ClubCardTrains.objects.filter(visit__in=d_visits)
             for ind, g in enumerate(self.groups):
                 cnt = workout.filter(training__order_num=g).count()
+                if ind == 0:
+                    # Personals visits add to first groups
+                    p_visits_cnt = UseClientPersonal.objects.filter(
+                        date__range=(df, dt),
+                        client_personal__personal__club_card_only=False
+                        ).count()
+                    cnt += p_visits_cnt
                 self.groups_cnt[ind] += cnt
                 line.append(cnt)
             rows.append(line)
