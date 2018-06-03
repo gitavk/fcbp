@@ -32,6 +32,14 @@ class Credit(models.Model):
                                                MaxValueValidator(100)])
     is_credit = models.BooleanField(default=False)
 
+    @property
+    def first_goods(self):
+        # first of existing goods
+        all_goods = (
+            self.club_card, self.aqua_aerobics, self.ticket,
+            self.personal, self.timing)
+        return next(x for x in all_goods if x)
+
     class Meta:
         ordering = ('schedule',)
 

@@ -51,9 +51,13 @@ msgstr "Отсутсвуют тренировки."
 msgid "Too many trainings"
 msgstr "Количество тренировок больше допустимого."
 
-#: clients/views.py:377
+#: clients/views.py: 513
 msgid "Card is disabled"
 msgstr "Клубная карта не активна."
+
+#: reports/views/managers.py:199
+msgid "Product is disabled"
+msgstr "Услуга не активна."
 
 #: reports/views/home.py:11
 msgid "Reports"

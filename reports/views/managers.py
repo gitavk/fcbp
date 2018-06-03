@@ -166,44 +166,45 @@ class CreditsClubCard(ReportTemplate):
 
     def get_data(self):
         rows = []
-        data = Credit.objects.filter(
-            club_card__isnull=False).order_by('schedule')
-        cards = []
+        products = []
+        qs = Credit.objects.order_by('schedule')
+        data = qs.filter(club_card__isnull=False)
+        data |= qs.filter(personal__isnull=False)
         for row in data:
-            card = row.club_card
-            if card.pk not in cards:
-                cards.append(card.pk)
+            product = row.first_goods
+            if product.pk not in products:
+                products.append(product.pk)
             else:
                 continue
             line = []
-            fname = card.client.first_name
-            pname = card.client.patronymic
-            lname = card.client.last_name
-            uid = card.client.uid
+            fname = product.client.first_name
+            pname = product.client.patronymic
+            lname = product.client.last_name
+            uid = product.client.uid
             line.append((fname, pname, lname, uid))
-            phone = card.client.mobile or card.client.phone or ''
-            tariff = card.club_card.short_name
-            amount = card.summ_amount
-            if card.discount_value:
-                dtype = '%' if card.discount_value <= 100 else _('rub.')
+            phone = product.client.mobile or product.client.phone or ''
+            tariff = product.product.short_name
+            amount = product.summ_amount
+            if product.discount_value:
+                dtype = '%' if product.discount_value <= 100 else _('rub.')
                 discount = u'{val} {dtype}'.format(
-                    val=card.discount_value, dtype=dtype)
+                    val=product.discount_value, dtype=dtype)
             else:
                 discount = ''
             line.append((phone, tariff, amount, discount))
-            if card.status < 2:
-                date_begin = card.date_begin.strftime('%d.%m.%Y')
-                date_end = card.date_end.strftime('%d.%m.%Y')
+            if product.status < 2:
+                date_begin = product.date_begin.strftime('%d.%m.%Y')
+                date_end = product.date_end.strftime('%d.%m.%Y')
             else:
-                date_begin = _("Card is disabled")
+                date_begin = _("Product is disabled")
                 date_end = ''
-            last_visit = card.visits.last()
+            last_visit = product.visits.last()
             if last_visit:
                 last_visit = last_visit.date.strftime('%d.%m.%Y')
             else:
                 last_visit = ''
             line.append((date_begin, date_end, '', last_visit))
-            credits = card.credit_set.all(
+            credits = product.credit_set.all(
             ).order_by('date').values_list('schedule', 'amount')
             amounts = []
             dates = []
