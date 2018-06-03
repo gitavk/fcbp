@@ -120,6 +120,11 @@ class Client(models.Model):
         return self.active_cc.first()
 
     @property
+    def active_p(self):
+        """Client's active personals"""
+        return self.clientpersonal_set.filter(status__gt=0)
+
+    @property
     def initial_purchase(self):
         initial_card = self.clientclubcard_set.order_by('date').first()
         initial_personal = self.clientpersonal_set.order_by('date').first()

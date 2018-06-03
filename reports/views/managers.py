@@ -436,18 +436,22 @@ class FullList(CommonList):
                 line.append(_('invalide date'))
             line.append(CommonList.format_mobile(row.mobile))
             cards = row.clientclubcard_set.filter(
-                date__range=(fdate, tdate))
-            if cards:
-                list_cards = cards.order_by('date').values_list(
-                    'club_card__short_name', flat=True)
-                line.append(", ".join(list_cards))
-                last_card = cards.order_by('-date')[0]
-            else:
-                line.append('')
+                date__range=(fdate, tdate)
+                ).order_by('date'
+                ).values_list('club_card__short_name', flat=True)
+            personals = row.clientpersonal_set.filter(
+                date__range=(fdate, tdate)
+                ).order_by('date'
+                ).values_list('personal__short_name', flat=True)
+            plist = list(cards) + list(personals)
+            line.append(", ".join(plist))
             line.append(row.email)
             active_cc = row.active_cc.values_list(
                 'club_card__name', flat=True)
-            line.append(", ".join(active_cc))
+            active_p = row.active_p.values_list(
+                'personal__name', flat=True)
+            pactive = list(active_cc) + list(active_p)
+            line.append(", ".join(pactive))
             rows.append(line)
         return rows
 
