@@ -188,11 +188,13 @@ class OtherPayments(Report):
         rows = []
         fdate = self.get_fdate().date()
         end_date = self.get_tdate() + timedelta(1)
-        data = Payment.objects.filter(
+        qs = Payment.objects.filter(
             date__range=(fdate, end_date)
-        ).exclude(club_card__isnull=True).filter(payment_type=0)
+        ).filter(payment_type=0)
+        data = qs.exclude(club_card__isnull=True)
+        data |= qs.exclude(personal__isnull=True)
         for row in data:
-            card = row.club_card
+            product = row.first_goods
             if row.extra_uid:
                 continue
             line = []
@@ -200,10 +202,10 @@ class OtherPayments(Report):
             line.append(row.date)
             line.append(row.client.uid)
             line.append(row.client.card)
-            line.append(card.short_name)
-            line.append(card.price())
+            line.append(product.short_name)
+            line.append(product.price())
             line.append(row.amount)
-            employee = card.employee.full_name if card.employee else ''
+            employee = product.employee.full_name if product.employee else ''
             line.append(employee)
             line.append(row.extra_text)
             rows.append(line)
