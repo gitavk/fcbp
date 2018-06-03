@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from reports import styles
 from clients.models import (
     ProlongationClubCard, UseClientClubCard, ClubCardTrains, ClientClubCard,
-    FreezeClubCard, UseClientPersonal)
+    FreezeClubCard, UseClientPersonal, ProlongationPersonal, ClientPersonal)
 from finance.models import Payment
 from products.models import Training
 from .base import ReportTemplate, Report
@@ -44,6 +44,23 @@ class ExtrProlongation(ReportTemplate):
         ln_head = len(self.table_headers) - 1
         self.ws.write_merge(1, 1, 0, ln_head, msg, styles.styleh)
 
+    @staticmethod
+    def _data_line(product):
+        line = []
+        ext_prolongation = product.ext_prolongation()
+        if not ext_prolongation:
+            return line
+        line.append(product.client.full_name)
+        period_data = {
+            'bdate': product.date_begin.strftime('%d.%m.%Y'),
+            'edate': product.date_end.strftime('%d.%m.%Y')
+        }
+        period = '{bdate}-{edate}'.format(**period_data)
+        line.append(period)
+        line.append(product.short_name)
+        line.append(ext_prolongation)
+        return line
+
     def get_data(self):
         rows = []
         fdate = self.get_fdate().date()
@@ -52,20 +69,17 @@ class ExtrProlongation(ReportTemplate):
             date__range=(fdate, tdate)).values('client_club_card')
         data = ClientClubCard.objects.filter(pk__in=club_cards)
         for row in data.order_by('date_end'):
-            line = []
-            card = row
-            ext_prolongation = card.ext_prolongation()
-            if not ext_prolongation:
+            line = self._data_line(row)
+            if not line:
                 continue
-            line.append(card.client.full_name)
-            period_data = {
-                'bdate': card.date_begin.strftime('%d.%m.%Y'),
-                'edate': card.date_end.strftime('%d.%m.%Y')
-            }
-            period = '{bdate}-{edate}'.format(**period_data)
-            line.append(period)
-            line.append(card.short_name)
-            line.append(ext_prolongation)
+            rows.append(line)
+        personals = ProlongationPersonal.objects.filter(
+            date__range=(fdate, tdate)).values('personal')
+        data = ClientPersonal.objects.filter(pk__in=personals)
+        for row in data.order_by('date_end'):
+            line = self._data_line(row)
+            if not line:
+                continue
             rows.append(line)
         return rows
 
