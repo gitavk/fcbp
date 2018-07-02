@@ -157,14 +157,14 @@ class RepDiscount(Report):
     }
 
     def initial(self, request, *args, **kwargs):
-        super(Discount, self).initial(request, *args, **kwargs)
+        super(RepDiscount, self).initial(request, *args, **kwargs)
         self.total = {}
 
     def get_title(self, **kwargs):
         return _('club cards discounts')
 
     def write_title(self):
-        super(Discount, self).write_title()
+        super(RepDiscount, self).write_title()
         msg = _('from: {fdate} to {tdate}')
         fdate = self.get_fdate().strftime('%d.%m.%Y')
         tdate = self.get_tdate().strftime('%d.%m.%Y')
