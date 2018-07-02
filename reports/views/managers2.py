@@ -134,7 +134,7 @@ class TotalActiveClubCard(TotalClubCard):
         return cards.values_list('pk', flat=True)
 
 
-class Discount(Report):
+class RepDiscount(Report):
 
     file_name = 'club_cards_discounts'
     sheet_name = 'club_cards_discounts'
