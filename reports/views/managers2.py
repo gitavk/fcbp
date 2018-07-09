@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 from reports import styles
 from finance.models import Payment
-from clients.models import ClientClubCard
+from clients.models import ClientClubCard, ClientPersonal
 from products.models import Period, ClubCard, Discount
 from .base import ReportTemplate, Report
 
@@ -211,7 +211,7 @@ class RepDiscount(Report):
             self.row_num += 1
 
 
-class ClubCardDisabled(Report):
+class CardDisabled(Report):
 
     file_name = 'club_cards_disabled'
     sheet_name = 'club_cards_disabled'
@@ -232,14 +232,14 @@ class ClubCardDisabled(Report):
     }
 
     def initial(self, request, *args, **kwargs):
-        super(ClubCardDisabled, self).initial(request, *args, **kwargs)
+        super(CardDisabled, self).initial(request, *args, **kwargs)
         self.total = 0
 
     def get_title(self, **kwargs):
         return _('blocked cards during the period')
 
     def write_title(self):
-        super(ClubCardDisabled, self).write_title()
+        super(CardDisabled, self).write_title()
         msg = _('from: {fdate} to {tdate}')
         fdate = self.get_fdate().strftime('%d.%m.%Y')
         tdate = self.get_tdate().strftime('%d.%m.%Y')
@@ -247,28 +247,39 @@ class ClubCardDisabled(Report):
         heads_ln = len(self.table_headers)
         self.ws.write_merge(1, 1, 0, heads_ln, msg, styles.styleh)
 
+    @staticmethod
+    def _line_generator(row):
+        line = []
+        line.append(row.date)
+        line.append(row.client.full_name)
+        line.append(row.client.uid)
+        period_data = {
+            'bdate': row.date_begin.strftime('%d.%m.%Y'),
+            'edate': row.date_end.strftime('%d.%m.%Y')
+        }
+        period = '{bdate}-{edate}'.format(**period_data)
+        line.append(period)
+        line.append(row.product.short_name)
+        line.append(row.block_comment)
+        return line
+
     def get_data(self):
         rows = []
         fdate = self.get_fdate().date()
         tdate = self.get_tdate().date() + timedelta(1)
-        data = ClientClubCard.objects.filter(
+        data_card = ClientClubCard.objects.filter(
             date_end__range=(fdate, tdate), status=0,
             block_comment__isnull=False
         ).exclude(block_comment='').order_by('date')
-        for row in data:
-            line = []
-            line.append(row.date)
-            line.append(row.client.full_name)
-            line.append(row.client.uid)
-            period_data = {
-                'bdate': row.date_begin.strftime('%d.%m.%Y'),
-                'edate': row.date_end.strftime('%d.%m.%Y')
-            }
-            period = '{bdate}-{edate}'.format(**period_data)
-            line.append(period)
-            line.append(row.club_card.short_name)
-            line.append(row.block_comment)
-            rows.append(line)
+        for row in data_card:
+            rows.append(self._line_generator(row))
+        data_pers = ClientPersonal.objects.filter(
+            date_end__range=(fdate, tdate), status=0,
+            block_comment__isnull=False
+        ).exclude(block_comment='').order_by('date')
+        for row in data_pers:
+            rows.append(self._line_generator(row))
+        rows.sort(key=lambda tup: tup[0])
         self.total = len(rows)
         return rows
 

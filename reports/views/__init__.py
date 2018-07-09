@@ -5,7 +5,7 @@ from .managers import (
     ActiveClubCard, CreditsClubCard, NewUid, CommonList, FullList,
     RepFitnessClubCard, RepPersonalClubCard, RepIntroductory)
 from .managers2 import (
-    TotalClubCard, TotalActiveClubCard, RepDiscount, ClubCardDisabled,
+    TotalClubCard, TotalActiveClubCard, RepDiscount, CardDisabled,
     ClubCardProspect, BestLoyalty, PeriodSales)
 from .managers3 import (
     ExtrProlongation, VisitsPeriod, OtherPayments, Freeze)
@@ -16,6 +16,6 @@ __all__ = [
     'CreditsClubCard', 'NewUid', 'CommonList', 'FullList',
     'RepFitnessClubCard', 'RepPersonalClubCard', 'RepIntroductory',
     'TotalClubCard', 'TotalActiveClubCard', 'RepDiscount',
-    'ClubCardDisabled', 'ClubCardProspect', 'BestLoyalty', 'PeriodSales',
+    'CardDisabled', 'ClubCardProspect', 'BestLoyalty', 'PeriodSales',
     'ExtrProlongation', 'VisitsPeriod', 'OtherPayments', 'Freeze',
     'ActivePersonal', 'UsePersonals', 'TotalPersonals', 'RUPC']
