@@ -178,7 +178,7 @@ class RepDiscount(Report):
         fdate = self.get_fdate().date()
         tdate = self.get_tdate().date() + timedelta(1)
         pqs = Payment.objects.filter(date__range=(fdate, tdate)
-            ).order_by('date')
+                                     ).order_by('date')
         payments = pqs.exclude(club_card__isnull=True)
         payments |= pqs.exclude(personal__isnull=True)
         for p in payments:
@@ -289,7 +289,7 @@ class CardDisabled(Report):
         self.ws.write(self.row_num, 2, self.total, styles.styleh)
 
 
-class ClubCardProspect(Report):
+class CardProspect(Report):
 
     file_name = 'club_cards_prospect'
     sheet_name = 'club_cards_prospect'
@@ -310,7 +310,7 @@ class ClubCardProspect(Report):
     }
 
     def initial(self, request, *args, **kwargs):
-        super(ClubCardProspect, self).initial(request, *args, **kwargs)
+        super(CardProspect, self).initial(request, *args, **kwargs)
         self.total = 0
 
     def get_title(self, **kwargs):
@@ -322,18 +322,27 @@ class ClubCardProspect(Report):
     def get_fdate(self):
         return datetime.now()
 
+    @staticmethod
+    def _line_generator(row):
+        line = []
+        line.append(row.first_payment.date)
+        line.append(row.client.full_name)
+        line.append(row.client.uid)
+        line.append(row.client.card)
+        line.append(row.product.short_name)
+        return line
+
     def get_data(self):
         rows = []
         data = ClientClubCard.objects.filter(
             date_begin__isnull=True, status__gt=0).order_by('-date')
         for row in data:
-            line = []
-            line.append(row.first_payment.date)
-            line.append(row.client.full_name)
-            line.append(row.client.uid)
-            line.append(row.client.card)
-            line.append(row.club_card.short_name)
-            rows.append(line)
+            rows.append(self._line_generator(row))
+        data = ClientPersonal.objects.filter(
+            date_begin__isnull=True, status__gt=0).order_by('-date')
+        for row in data:
+            rows.append(self._line_generator(row))
+        rows.sort(key=lambda tup: tup[0])
         self.total = len(rows)
         return rows
 

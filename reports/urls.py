@@ -5,7 +5,7 @@ from .views import (
     Sales, Visits, Birthdays, ActiveClubCard, CreditsClubCard, NewUid,
     CommonList, FullList, RepFitnessClubCard, RepPersonalClubCard,
     RepIntroductory, TotalClubCard, TotalActiveClubCard, RepDiscount,
-    CardDisabled, ClubCardProspect, BestLoyalty, PeriodSales,
+    CardDisabled, CardProspect, BestLoyalty, PeriodSales,
     ExtrProlongation, VisitsPeriod, OtherPayments, Freeze, ActivePersonal,
     UsePersonals, TotalPersonals, RUPC)
 
@@ -26,7 +26,7 @@ router.register(r'totalcc', TotalClubCard,  base_name='totalcc')
 router.register(r'totalacc', TotalActiveClubCard,  base_name='totalacc')
 router.register(r'ccdiscounts', RepDiscount,  base_name='ccdiscounts')
 router.register(r'ccdisabled', CardDisabled,  base_name='ccdisabled')
-router.register(r'ccprospect', ClubCardProspect,  base_name='ccprospect')
+router.register(r'ccprospect', CardProspect,  base_name='ccprospect')
 router.register(r'bl', BestLoyalty,  base_name='bl')
 router.register(r'ps', PeriodSales,  base_name='ps')
 router.register(r'ep', ExtrProlongation,  base_name='ep')
