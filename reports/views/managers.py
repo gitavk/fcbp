@@ -34,7 +34,7 @@ class ActiveClubCard(ReportTemplate):
     ]
 
     table_styles = {
-        2: styles.styled,
+        3: styles.styled,
     }
 
     def initial(self, request, *args, **kwargs):
