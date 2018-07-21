@@ -3,10 +3,12 @@ from collections import defaultdict
 from datetime import timedelta, datetime
 
 from django.utils.translation import ugettext as _
+from django.db.models import Q
 
 from reports import styles
-from finance.models import Payment
 from clients.models import ClientClubCard, ClientPersonal
+from finance.models import Payment
+from employees.models import Employee
 from products.models import Period, ClubCard, Discount
 from .base import ReportTemplate, Report
 
@@ -593,3 +595,116 @@ class PeriodSales(Report):
         self.row_num += 1
         self.ws.write(self.row_num, 2, _('all personal sales'))
         self._bottom_details(self.total_payments.get('personal', {}))
+
+
+class SellerSales(Report):
+
+    file_name = 'report_seller_sales_for_period'
+    sheet_name = 'report'
+
+    table_headers = [
+        (_('paid date'), 3000),
+        (_('time'), 2000),
+        (_('client'), 8000),
+        (_('co number'), 4000),
+        (_('card number'), 2000),
+        (_('tariff'), 6000),
+        (_('full price'), 4000),
+        (_('discount'), 4000),
+        (_('discount type'), 4000),
+        (_('paid'), 4000),
+        (_('paid type'), 4000),
+    ]
+
+    table_styles = {
+        0: styles.styled,
+        1: styles.stylet,
+        6: styles.stylef,
+        9: styles.stylef,
+    }
+
+    @property
+    def _get_seller(self,):
+        s_id = self.request.query_params.get('s')
+        return Employee.objects.filter(pk=s_id).first()
+
+    def initial(self, request, *args, **kwargs):
+        super(SellerSales, self).initial(request, *args, **kwargs)
+        payment_types = dict.fromkeys(Payment.payment_types.keys(), 0)
+        self.total_payments = {
+            'card': payment_types.copy(),
+            'personal': payment_types.copy(),
+            'all': payment_types.copy(),
+        }
+
+    def get_title(self, **kwargs):
+        msg = _(
+            'report on the sales cards for the period {seller}.')
+        msg += _(' created at: {date}.')
+        date = datetime.now().strftime('%d.%m.%Y %H:%M')
+        return msg.format(seller=self._get_seller.full_name, date=date)
+
+    def write_title(self):
+        super(SellerSales, self).write_title()
+        msg = _('from: {fdate} to {tdate}')
+        fdate = self.get_fdate().strftime('%d.%m.%Y')
+        tdate = self.get_tdate().strftime('%d.%m.%Y')
+        msg = msg.format(fdate=fdate, tdate=tdate)
+        heads_ln = len(self.table_headers)
+        self.ws.write_merge(1, 1, 0, heads_ln, msg, styles.styleh)
+
+    def get_data(self):
+        rows = []
+        fdate = self.get_fdate().date()
+        emp = self._get_seller
+        end_date = self.get_tdate() + timedelta(1)
+        qs = Payment.objects.filter(
+            date__range=(fdate, end_date)
+        ).exclude(payment_type=3)
+        data = qs.filter(club_card__employee=emp).exclude(club_card__isnull=True)
+        data |= qs.filter(personal__employee=emp).exclude(personal__isnull=True)
+        for row in data:
+            line = []
+            card = row.club_card or row.personal
+            line.append(row.date)
+            line.append(row.date.strftime('%H:%M'))
+            line.append(row.client.full_name)
+            line.append(row.client.uid)
+            line.append(row.client.card)
+            line.append(row.first_goods.short_name)
+            if not row.extra_uid:
+                line.append(card.price())
+                line.append(card.discount_value)
+                line.append(card.discount_short)
+            else:
+                line.append('')
+                line.append('')
+                line.append('')
+            line.append(row.amount)
+            ptype = Payment.payment_types.get(row.payment_type)
+            line.append(ptype)
+            self.total_payments['all'][row.payment_type] += row.amount
+            if row.club_card:
+                self.total_payments['card'][row.payment_type] += row.amount
+            else:
+                self.total_payments['personal'][row.payment_type] += row.amount
+            rows.append(line)
+        return rows
+
+    def _bottom_details(self, details):
+        self.ws.write(self.row_num, 4, sum(details.values()))
+        self.row_num += 1
+        for x in (1, 2, 0):
+            self.ws.write(self.row_num, 2, Payment.payment_types[x])
+            self.ws.write(self.row_num, 4, details[x])
+            self.row_num += 1
+
+    def write_bottom(self):
+        self.ws.write(self.row_num, 2, _('all card sales'))
+        self._bottom_details(self.total_payments.get('card', {}))
+        self.row_num += 1
+        self.ws.write(self.row_num, 2, _('all personal sales'))
+        self._bottom_details(self.total_payments.get('personal', {}))
+        self.row_num += 1
+        self.ws.write(self.row_num, 2, _('all sales'))
+        self._bottom_details(self.total_payments.get('all', {}))

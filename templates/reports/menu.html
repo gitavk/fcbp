@@ -170,6 +170,20 @@
       {% endfor %}
     </select>
   </div>
+  <div class="col-md-3">
+    <a id='r_seller_sales' href="/api/v1/reports/ss/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}&s=0"
+    class="btn btn-info btn-block">По продажам продавцов</a>
+  </div>
+  <div class="col-md-3">
+    <select name="sellers" class="btn-block">
+      <option value="0">Обязательно выбрать</option>
+      {% for option in seller_options %}
+      <option value="{{ option.pk }}">
+        {{ option.initials }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
 </div>
 <br>
 
@@ -253,6 +267,11 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_sells[5], 'fdate', fdate)
     var r_sells_url = r_sells.slice(0, 5).join('/') + '/' + get_str
     $('#r_sells').attr('href', r_sells_url)
+    // r_seller_sales
+    var r_seller_sales = $('#r_seller_sales').attr('href').split('/')
+    var get_str = updateUrlParam(r_seller_sales[5], 'fdate', fdate)
+    var r_seller_sales_url = r_seller_sales.slice(0, 5).join('/') + '/' + get_str
+    $('#r_seller_sales').attr('href', r_seller_sales_url)
     // r_visits
     var r_visits = $('#r_visits').attr('href').split('/')
     var get_str = updateUrlParam(r_visits[5], 'fdate', fdate)
@@ -442,6 +461,11 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_total_personal[5], 'tdate', tdate)
     var r_total_personal_url = r_total_personal.slice(0, 5).join('/') + '/' + get_str
     $('#r_total_personal').attr('href', r_total_personal_url)
+    // r_seller_sales
+    var r_seller_sales = $('#r_seller_sales').attr('href').split('/')
+    var get_str = updateUrlParam(r_seller_sales[5], 'tdate', tdate)
+    var r_seller_sales_url = r_seller_sales.slice(0, 5).join('/') + '/' + get_str
+    $('#r_seller_sales').attr('href', r_seller_sales_url)
   });
 
   $('[name=club_card_type]').change(function() {
@@ -466,6 +490,14 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_use_personal[5], 'c', coach)
     var r_use_personal_url = r_use_personal.slice(0, 5).join('/') + '/' + get_str
     $('#r_use_personal').attr('href', r_use_personal_url)
+  });
+
+  $('[name=sellers]').change(function() {
+    var coach = $(this).val()
+    var r_seller_sales = $('#r_seller_sales').attr('href').split('/')
+    var get_str = updateUrlParam(r_seller_sales[5], 's', coach)
+    var r_seller_sales_url = r_seller_sales.slice(0, 5).join('/') + '/' + get_str
+    $('#r_seller_sales').attr('href', r_seller_sales_url)
   });
 });
 </script>

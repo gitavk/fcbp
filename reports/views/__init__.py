@@ -6,16 +6,16 @@ from .managers import (
     RepFitnessClubCard, RepPersonalClubCard, RepIntroductory)
 from .managers2 import (
     TotalClubCard, TotalActiveClubCard, RepDiscount, CardDisabled,
-    CardProspect, BestLoyalty, PeriodSales)
+    CardProspect, BestLoyalty, PeriodSales, SellerSales)
 from .managers3 import (
     ExtrProlongation, VisitsPeriod, OtherPayments, Freeze)
 from .personals import ActivePersonal, UsePersonals, TotalPersonals
 
 __all__ = [
-    'Sales', 'Home', 'Visits', 'Birthdays', 'ActiveClubCard',
-    'CreditsClubCard', 'NewUid', 'CommonList', 'FullList',
-    'RepFitnessClubCard', 'RepPersonalClubCard', 'RepIntroductory',
-    'TotalClubCard', 'TotalActiveClubCard', 'RepDiscount',
-    'CardDisabled', 'CardProspect', 'BestLoyalty', 'PeriodSales',
-    'ExtrProlongation', 'VisitsPeriod', 'OtherPayments', 'Freeze',
-    'ActivePersonal', 'UsePersonals', 'TotalPersonals', 'RUPC']
+    'ActiveClubCard', 'ActivePersonal', 'BestLoyalty', 'Birthdays',
+    'CardDisabled', 'CardProspect', 'CommonList', 'CreditsClubCard',
+    'ExtrProlongation', 'Freeze', 'FullList', 'Home', 'NewUid',
+    'OtherPayments', 'PeriodSales', 'RUPC', 'RepDiscount',
+    'RepFitnessClubCard', 'RepIntroductory', 'RepPersonalClubCard',
+    'Sales', 'SellerSales', 'TotalActiveClubCard', 'TotalClubCard',
+    'TotalPersonals', 'UsePersonals', 'Visits', 'VisitsPeriod']

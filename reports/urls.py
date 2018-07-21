@@ -2,12 +2,13 @@
 from rest_framework import routers
 
 from .views import (
-    Sales, Visits, Birthdays, ActiveClubCard, CreditsClubCard, NewUid,
-    CommonList, FullList, RepFitnessClubCard, RepPersonalClubCard,
-    RepIntroductory, TotalClubCard, TotalActiveClubCard, RepDiscount,
-    CardDisabled, CardProspect, BestLoyalty, PeriodSales,
-    ExtrProlongation, VisitsPeriod, OtherPayments, Freeze, ActivePersonal,
-    UsePersonals, TotalPersonals, RUPC)
+    ActiveClubCard, ActivePersonal, BestLoyalty, Birthdays,
+    CardDisabled, CardProspect, CommonList, CreditsClubCard,
+    ExtrProlongation, Freeze, FullList, Home, NewUid,
+    OtherPayments, PeriodSales, RUPC, RepDiscount,
+    RepFitnessClubCard, RepIntroductory, RepPersonalClubCard,
+    Sales, SellerSales, TotalActiveClubCard, TotalClubCard,
+    TotalPersonals, UsePersonals, Visits, VisitsPeriod)
 
 
 router = routers.SimpleRouter()
@@ -33,6 +34,7 @@ router.register(r'ep', ExtrProlongation,  base_name='ep')
 router.register(r'visits_p', VisitsPeriod,  base_name='visits_p')
 router.register(r'op', OtherPayments,  base_name='op')
 router.register(r'freeze', Freeze,  base_name='freeze')
+router.register(r'ss', SellerSales,  base_name='sellersales')
 
 router.register(r'apc', ActivePersonal,  base_name='apc')
 router.register(r'upc', UsePersonals,  base_name='upc')

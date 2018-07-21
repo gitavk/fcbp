@@ -120,8 +120,14 @@ msgstr "Отчет администратора о продажах по клу�
 msgid "report on the sales cards for the period."
 msgstr "Отчет о продажах по клубным картам  и доп опциям за период."
 
+msgid "report on the sales cards for the period {seller}."
+msgstr "Отчет о продажах по клубным картам  и доп опциям за период {seller}."
+
 msgid "annotation"
 msgstr "пояснение"
+
+msgid "all sales"
+msgstr "всего продаж"
 
 msgid "all card sales"
 msgstr "всего продаж карт"

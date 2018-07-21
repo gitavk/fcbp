@@ -21,10 +21,13 @@ class Home(View, ):
         ).order_by('personal__name').distinct()
         trainers = Employee.objects.filter(personals__isnull=False
             ).distinct().order_by('last_name')
+        seller_options = Employee.objects.filter(
+            is_seller=True, is_active=True
+            ).order_by('last_name')
         cont = dict(
             request=request, title=_('Reports'),
             cc_options=cc_options, pc_options=pc_options,
-            trainers=trainers,
+            trainers=trainers, seller_options=seller_options
         )
         return render_to_response(self.template_name, cont)
 
