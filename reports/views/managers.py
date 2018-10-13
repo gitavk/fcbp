@@ -2,15 +2,14 @@
 from datetime import timedelta, datetime, date
 
 from django.utils.translation import ugettext as _
-from django.db.models import Sum
 
-from .base import ReportTemplate, Report
 from reports import styles
 from clients.models import (
-    ClientClubCard, UseClientClubCard, Client, ClubCardTrains,
+    ClientClubCard, Client, ClubCardTrains,
     FitnessClubCard, PersonalClubCard, ClientPersonal)
 from products.models import ClubCard
-from finance.models import Payment, Credit
+from finance.models import Credit
+from .base import ReportTemplate, Report
 
 
 class ActiveClubCard(ReportTemplate):
@@ -42,7 +41,7 @@ class ActiveClubCard(ReportTemplate):
         try:
             clubcard_id = self.request.query_params.get('cc')
             self.clubcard = ClubCard.objects.get(pk=clubcard_id)
-        except:
+        except (ValueError, ClubCard.DoesNotExist):
             self.clubcard = 'all'
 
     def get_fdate(self):
@@ -90,21 +89,21 @@ class ActiveClubCard(ReportTemplate):
             else:
                 line.append(('', '', '', ''))
             schedule = []
-            for p in row.schedule_payments():
-                if p[0] <= self.get_fdate():
+            for payment in row.schedule_payments():
+                if payment[0] <= self.get_fdate():
                     continue
-                pdate = p[0].strftime('%d.%m.%Y')
-                pamount = "{:,}".format(p[1]).replace(',', ' ')
+                pdate = payment[0].strftime('%d.%m.%Y')
+                pamount = "{:,}".format(payment[1]).replace(',', ' ')
                 schedule.append("%s - %s" % (pamount, pdate))
             schedule.extend([''] * (4 - len(schedule)))
             line.append(schedule)
             freeze = []
-            use_freeze = row.freeze.all()
-            for f in use_freeze.filter(is_extra=False, is_paid=False):
-                freeze.append(f.days)
-            use_prol = row.prolongation.all()
-            for p in use_prol.filter(is_extra=False, is_paid=False):
-                freeze.append(p.days)
+            use_freeze = row.freeze.filter(is_extra=False, is_paid=False)
+            for days in use_freeze.values_list('days', flat=True):
+                freeze.append(days)
+            prolongations = row.prolongation.filter(is_extra=False, is_paid=False)
+            for days in prolongations.values_list('days', flat=True):
+                freeze.append(days)
             freeze.extend([''] * (4 - len(freeze)))
             line.append(freeze)
             fitness = row.fitnessclubcard_set.first()
@@ -167,9 +166,9 @@ class CreditsClubCard(ReportTemplate):
     def get_data(self):
         rows = []
         products = []
-        qs = Credit.objects.order_by('schedule')
-        data = qs.filter(club_card__isnull=False)
-        data |= qs.filter(personal__isnull=False)
+        query = Credit.objects.order_by('schedule')
+        data = query.filter(club_card__isnull=False)
+        data |= query.filter(personal__isnull=False)
         for row in data:
             product = row.first_goods
             if product.pk not in products:
@@ -184,7 +183,7 @@ class CreditsClubCard(ReportTemplate):
             line.append((fname, pname, lname, uid))
             phone = product.client.mobile or product.client.phone or ''
             tariff = product.product.short_name
-            amount = product.summ_amount
+            amount = product.m_amount
             if product.discount_value:
                 dtype = '%' if product.discount_value <= 100 else _('rub.')
                 discount = u'{val} {dtype}'.format(
@@ -204,11 +203,11 @@ class CreditsClubCard(ReportTemplate):
             else:
                 last_visit = ''
             line.append((date_begin, date_end, '', last_visit))
-            credits = product.credit_set.all(
+            credits_ = product.credit_set.all(
             ).order_by('date').values_list('schedule', 'amount')
             amounts = []
             dates = []
-            for cr_date, cr_amount in credits:
+            for cr_date, cr_amount in credits_:
                 amounts.append(cr_amount)
                 if cr_date < date(1900, 1, 1):
                     dates.append('')
@@ -230,6 +229,7 @@ class CreditsClubCard(ReportTemplate):
 
     def write_multi_data(self, coll, cell, style):
         row_step = 0
+        j = 0
         for j, subcell in enumerate(cell[:-1]):
             if coll == 4:
                 self.write_crdate(self.row_num + j, subcell, style)
@@ -432,16 +432,18 @@ class FullList(CommonList):
             line.append(row.card)
             try:
                 line.append(row.born.strftime('%d.%m.%Y'))
-            except Exception as e:
+            except ValueError:
                 line.append(_('invalide date'))
             line.append(CommonList.format_mobile(row.mobile))
             cards = row.clientclubcard_set.filter(
                 date__range=(fdate, tdate)
-                ).order_by('date'
+                ).order_by(
+                    'date'
                 ).values_list('club_card__short_name', flat=True)
             personals = row.clientpersonal_set.filter(
                 date__range=(fdate, tdate)
-                ).order_by('date'
+                ).order_by(
+                    'date'
                 ).values_list('personal__short_name', flat=True)
             plist = list(cards) + list(personals)
             line.append(", ".join(plist))

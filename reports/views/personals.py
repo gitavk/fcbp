@@ -1,5 +1,8 @@
+"""
+Statistic of the client Personals.
+"""
 # -*- coding: utf-8 -*-
-from datetime import timedelta, datetime, date
+from datetime import timedelta, datetime
 from collections import defaultdict
 
 from django.db.models import Sum
@@ -7,7 +10,6 @@ from django.utils.translation import ugettext as _
 
 from employees.models import Employee
 from clients.models import ClientPersonal, UseClientPersonal
-from finance.models import Payment
 from products.models import Personal
 from reports import styles
 from .base import Report
@@ -34,7 +36,7 @@ class ActivePersonal(Report):
         (_('prolongation'), 2000),
         (_('tariff club card'), 2000),
         (_('club card period'), 6000),
-        (_('schedule payments'), 6000),
+        (_('schedule s'), 6000),
         (_('extra clients'), 6000),
         (_('coach'), 4000),
     ]
@@ -54,7 +56,7 @@ class ActivePersonal(Report):
         try:
             personal_id = int(self.request.query_params.get('pc'))
             self.personal = Personal.objects.get(pk=personal_id)
-        except:
+        except (ValueError, Personal.DoesNotExist):
             self.personal = 'all'
 
     def get_fdate(self):
@@ -92,18 +94,18 @@ class ActivePersonal(Report):
             cc_name = ''
             cc_period = ''
             if row.product.club_card_only and row.client.active_cc_first:
-                cc = row.client.active_cc_first
-                cc_name = cc.short_name
-                dbegin = cc.date_begin.strftime('%d.%m.%Y')
-                dend = cc.date_end.strftime('%d.%m.%Y')
+                club_card = row.client.active_cc_first
+                cc_name = club_card.short_name
+                dbegin = club_card.date_begin.strftime('%d.%m.%Y')
+                dend = club_card.date_end.strftime('%d.%m.%Y')
                 cc_period = "{}-{}".format(dbegin, dend)
             # generate credits shedule
             schedule = []
-            for p in row.schedule_payments():
-                if p[0] <= self.get_fdate():
+            for payment in row.schedule_payments():
+                if payment[0] <= self.get_fdate():
                     continue
-                pdate = p[0].strftime('%d.%m.%Y')
-                pamount = "{:,}".format(p[1]).replace(',', ' ')
+                pdate = payment[0].strftime('%d.%m.%Y')
+                pamount = "{:,}".format(payment[1]).replace(',', ' ')
                 schedule.append("%s - %s" % (pamount, pdate))
             schedule = "; \n".join(schedule)
             # extra clients info
@@ -128,10 +130,10 @@ class ActivePersonal(Report):
                 cc_name = ''
                 cc_period = ''
                 if row.product.club_card_only and curr_ec.active_cc_first:
-                    cc = row.curr_ec.active_cc_first
-                    cc_name = cc.short_name
-                    dbegin = cc.date_begin.strftime('%d.%m.%Y')
-                    dend = cc.date_end.strftime('%d.%m.%Y')
+                    club_card = row.curr_ec.active_cc_first
+                    cc_name = club_card.short_name
+                    dbegin = club_card.date_begin.strftime('%d.%m.%Y')
+                    dend = club_card.date_end.strftime('%d.%m.%Y')
                     cc_period = "{}-{}".format(dbegin, dend)
                 slave_ecs = [ec for ec in extra_clients if ec != curr_ec]
                 slave_ecs += [row.client]
@@ -193,7 +195,7 @@ class UsePersonals(Report):
         try:
             personal_id = int(self.request.query_params.get('c'))
             self.instructor = Employee.objects.get(pk=personal_id)
-        except:
+        except (ValueError, Employee.DoesNotExist):
             self.instructor = 'all'
 
     def get_title(self, **kwargs):
@@ -286,13 +288,12 @@ class TotalPersonals(Report):
     def personals_list(self):
         fdate = self.get_fdate().date()
         tdate = self.get_tdate().date() + timedelta(1)
-        personals = ClientPersonal.objects.filter(
-            payment__date__range=(fdate, tdate))
+        personals = ClientPersonal.objects.filter(payment__date__range=(fdate, tdate))
         # generate filter to get only first payment
         filter_pk = []
-        for p in personals:
-            if p.first_payment.date.date() >= fdate:
-                filter_pk.append(p.pk)
+        for personal in personals:
+            if personal.first_payment.date.date() >= fdate:
+                filter_pk.append(personal.pk)
         return personals.filter(pk__in=filter_pk)
 
     def get_data(self):
