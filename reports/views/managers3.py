@@ -6,7 +6,8 @@ from django.utils.translation import ugettext as _
 from reports import styles
 from clients.models import (
     ProlongationClubCard, UseClientClubCard, ClubCardTrains, ClientClubCard,
-    FreezeClubCard, UseClientPersonal, ProlongationPersonal, ClientPersonal)
+    FreezeClubCard, UseClientPersonal, ProlongationPersonal, ClientPersonal,
+    OwnersClubCard)
 from finance.models import Payment
 from products.models import Training
 from .base import ReportTemplate, Report
@@ -237,6 +238,7 @@ class OtherPayments(Report):
 
 
 class Freeze(ReportTemplate):
+    """Details of the freeze for period."""
     file_name = 'freeze_cards_for_the_period'
     sheet_name = 'report'
     tpl_path = 'xls_tpl/freeze.xls'
@@ -323,3 +325,59 @@ class Freeze(ReportTemplate):
 
     def write_bottom(self):
         pass
+
+
+class ReportOwnersClubCard(Report):
+    """List new card onewrs for period."""
+    file_name = 'club_card_OwnersClubCard'
+    sheet_name = 'report'
+
+    table_headers = [
+        (_('date of renewal'), 6000),
+        (_('new client'), 8000),
+        (_('club card num'), 4000),
+        (_('# uid'), 4000),
+        (_('old client'), 8000),
+        (_('club card num'), 4000),
+        (_('# uid'), 4000),
+        (_('tariff'), 6000),
+    ]
+
+    table_styles = {
+        0: styles.styled,
+    }
+
+    def get_title(self, **kwargs):
+        return _("report new card onewrs").capitalize()
+
+    def write_title(self):
+        super(ReportOwnersClubCard, self).write_title()
+        msg = _('from: {fdate} to {tdate}')
+        fdate = self.get_fdate().strftime('%d.%m.%Y')
+        tdate = self.get_tdate().strftime('%d.%m.%Y')
+        msg = msg.format(fdate=fdate, tdate=tdate)
+        ln_head = len(self.table_headers) - 1
+        self.ws.write_merge(1, 1, 0, ln_head, msg, styles.styleh)
+
+    def get_data(self):
+        rows = []
+        fdate = self.get_fdate().date()
+        end_date = self.get_tdate() + timedelta(1)
+        query = OwnersClubCard.objects.filter(date__range=(fdate, end_date))
+        for row in query:
+            line = []
+            line.append(row.date)
+            line.append(row.club_card.client.initials)
+            line.append(row.club_card.client.uid)
+            line.append(row.club_card.client.card)
+            line.append(row.client.initials)
+            line.append(row.client.uid)
+            line.append(row.client.card)
+            line.append(row.club_card.product.short_name)
+            rows.append(line)
+        return rows
+
+    def write_bottom(self):
+        total = len(self.get_data())
+        self.ws.write(self.row_num, 0, _('total for period'))
+        self.ws.write(self.row_num, 1, total, styles.styleh)

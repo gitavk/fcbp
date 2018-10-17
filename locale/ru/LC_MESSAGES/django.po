@@ -413,3 +413,15 @@ msgstr "в том числе по видам тарифного плана:"
 
 msgid "total personals"
 msgstr "Сводный отчет по видам проданных клип-карт"
+
+msgid "new client"
+msgstr "'Новый' клиент"
+
+msgid "old client"
+msgstr "'Старый' клиент"
+
+msgid "report new card onewrs"
+msgstr "Отчет по переоформленным картам за период"
+
+msgid "date of renewal"
+msgstr "дата переоформления"

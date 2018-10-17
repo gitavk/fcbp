@@ -217,29 +217,39 @@
 </div>
 <br>
 
-<!-- reception -->
-  <div class="col-md-5 center-block">&nbsp;</div>
-  <div class="col-md-3 center-block"><strong>Ресепшен</strong></div>
-  <div class="col-md-4 center-block">&nbsp;</div>
-  <div class="clo-md-12">&nbsp;</div>
-  <div class="row">
-    <div class="col-lg-3">
-      <a id='r_sells' href="/api/v1/reports/sales/?fdate={% now 'd.m.Y' %}" class="btn btn-success btn-block">
-        продажи за день</a>
-    </div>
-    <div class="col-lg-3">
-      <a id='r_visits'
-      href="/api/v1/reports/visits/?fdate={% now 'd.m.Y' %}"
-      class="btn btn-warning btn-block">
-        посещения</a>
-    </div>
-    <div class="col-lg-3">
-      <a id='r_birthdays'
-      href="/api/v1/reports/birthdays/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}"
-      class="btn btn-info btn-block">
-        Дни рождения</a>
-    </div>
+<!-- renew block -->
+<div class="clo-md-12">&nbsp;</div>
+<div class="row">
+  <div class="col-md-3">
+    <a id='r_owners' href="/api/v1/reports/owners/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}&c=0" class="btn btn-success btn-block"
+      style="white-space: normal;">
+      <small>Отчёт по переоформленным картам</small></a>
   </div>
+</div>
+<br>
+
+<div class="col-md-5 center-block">&nbsp;</div><!-- reception -->
+<div class="col-md-3 center-block"><strong>Ресепшен</strong></div>
+<div class="col-md-4 center-block">&nbsp;</div>
+<div class="clo-md-12">&nbsp;</div>
+<div class="row">
+  <div class="col-lg-3">
+    <a id='r_sells' href="/api/v1/reports/sales/?fdate={% now 'd.m.Y' %}" class="btn btn-success btn-block">
+      продажи за день</a>
+  </div>
+  <div class="col-lg-3">
+    <a id='r_visits'
+    href="/api/v1/reports/visits/?fdate={% now 'd.m.Y' %}"
+    class="btn btn-warning btn-block">
+      посещения</a>
+  </div>
+  <div class="col-lg-3">
+    <a id='r_birthdays'
+    href="/api/v1/reports/birthdays/?fdate={% now 'd.m.Y' %}&tdate={% now 'd.m.Y' %}"
+    class="btn btn-info btn-block">
+      Дни рождения</a>
+  </div>
+</div><!-- reception -->
 
 {% endblock %}
 
@@ -367,6 +377,11 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_total_personal[5], 'fdate', fdate)
     var r_total_personal_url = r_total_personal.slice(0, 5).join('/') + '/' + get_str
     $('#r_total_personal').attr('href', r_total_personal_url)
+    // r_owners
+    var r_owners = $('#r_owners').attr('href').split('/')
+    var get_str = updateUrlParam(r_owners[5], 'fdate', fdate)
+    var r_owners_url = r_owners.slice(0, 5).join('/') + '/' + get_str
+    $('#r_owners').attr('href', r_owners_url)
   });
 
   $('[name=tdate]').change(function() {
@@ -466,6 +481,11 @@ var updateUrlParam = function updateUrlParam(get_string, param, value) {
     var get_str = updateUrlParam(r_seller_sales[5], 'tdate', tdate)
     var r_seller_sales_url = r_seller_sales.slice(0, 5).join('/') + '/' + get_str
     $('#r_seller_sales').attr('href', r_seller_sales_url)
+    // r_owners
+    var r_owners = $('#r_owners').attr('href').split('/')
+    var get_str = updateUrlParam(r_owners[5], 'tdate', tdate)
+    var r_owners_url = r_owners.slice(0, 5).join('/') + '/' + get_str
+    $('#r_owners').attr('href', r_owners_url)
   });
 
   $('[name=club_card_type]').change(function() {

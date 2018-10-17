@@ -8,7 +8,8 @@ from .views import (
     OtherPayments, PeriodSales, RUPC, RepDiscount,
     RepFitnessClubCard, RepIntroductory, RepPersonalClubCard,
     Sales, SellerSales, TotalActiveClubCard, TotalClubCard,
-    TotalPersonals, UsePersonals, Visits, VisitsPeriod)
+    TotalPersonals, UsePersonals, Visits, VisitsPeriod,
+    ReportOwnersClubCard)
 
 
 router = routers.SimpleRouter()
@@ -35,6 +36,7 @@ router.register(r'visits_p', VisitsPeriod,  base_name='visits_p')
 router.register(r'op', OtherPayments,  base_name='op')
 router.register(r'freeze', Freeze,  base_name='freeze')
 router.register(r'ss', SellerSales,  base_name='sellersales')
+router.register(r'owners', ReportOwnersClubCard, base_name='cc_owners')
 
 router.register(r'apc', ActivePersonal,  base_name='apc')
 router.register(r'upc', UsePersonals,  base_name='upc')
