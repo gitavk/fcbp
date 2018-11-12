@@ -183,7 +183,7 @@ class CreditsClubCard(ReportTemplate):
             line.append((fname, pname, lname, uid))
             phone = product.client.mobile or product.client.phone or ''
             tariff = product.product.short_name
-            amount = product.m_amount
+            amount = product.summ_amount
             if product.discount_value:
                 dtype = '%' if product.discount_value <= 100 else _('rub.')
                 discount = u'{val} {dtype}'.format(

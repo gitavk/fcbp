@@ -130,7 +130,7 @@ class ActivePersonal(Report):
                 cc_name = ''
                 cc_period = ''
                 if row.product.club_card_only and curr_ec.active_cc_first:
-                    club_card = row.curr_ec.active_cc_first
+                    club_card = curr_ec.active_cc_first
                     cc_name = club_card.short_name
                     dbegin = club_card.date_begin.strftime('%d.%m.%Y')
                     dend = club_card.date_end.strftime('%d.%m.%Y')
